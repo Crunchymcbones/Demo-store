@@ -1,7 +1,5 @@
 DROP DATABASE IF EXISTS easy_cheese;
 CREATE DATABASE easy_cheese;
-use easy_cheese;
-
 
 USE easy_cheese;
 
