@@ -152,7 +152,7 @@
         <x>10</x>
         <y>10</y>
         <width>271</width>
-        <height>281</height>
+        <height>261</height>
        </rect>
       </property>
       <property name="title">
@@ -296,6 +296,55 @@
         </rect>
        </property>
       </widget>
+      <widget class="QLabel" name="label">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>20</y>
+         <width>71</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Product Name:</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="invPnameCbo">
+       <property name="geometry">
+        <rect>
+         <x>90</x>
+         <y>20</y>
+         <width>171</width>
+         <height>22</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="peditBtn">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>230</y>
+         <width>75</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Edit</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pdelBtn">
+       <property name="geometry">
+        <rect>
+         <x>100</x>
+         <y>230</y>
+         <width>75</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Delete</string>
+       </property>
+      </widget>
      </widget>
      <widget class="QGroupBox" name="groupBox_2">
       <property name="geometry">
@@ -303,7 +352,7 @@
         <x>10</x>
         <y>310</y>
         <width>271</width>
-        <height>191</height>
+        <height>211</height>
        </rect>
       </property>
       <property name="title">
@@ -422,6 +471,19 @@
          <width>171</width>
          <height>20</height>
         </rect>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="aaddProductBtn">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>180</y>
+         <width>75</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Add Product</string>
        </property>
       </widget>
      </widget>
