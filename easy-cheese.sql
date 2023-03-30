@@ -3,6 +3,8 @@ CREATE DATABASE easy_cheese;
 use easy_cheese;
 
 
+USE easy_cheese;
+
 CREATE TABLE customers (
     customer_id     INT             AUTO_INCREMENT      PRIMARY KEY,
     name            VARCHAR(20)     NOT NULL,
@@ -53,4 +55,11 @@ INSERT INTO products (name, product_desc, vendor_id, qty, price)
 VALUES  ("brie",      "a soft disc of cheese",  1, 17, 10.99),
         ("cheddar",   "a sharp classic",        2, 50, 5.49),
         ("parmesian", "a hard italian cheese",  1, 10, 25.99);
+
+INSERT INTO invoices (invoice_id, customer_id, invoice_cost, date)
+VALUES  (1,3,287.76,"2023-03-27"),
+        (2,4,54.23,"2023-01-20"),
+        (3,2,44.12,"2000-08-19"),
+        (4,2,776.12,"2020-12-25");
+
 
