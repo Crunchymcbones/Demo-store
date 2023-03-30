@@ -39,6 +39,9 @@
         <height>601</height>
        </rect>
       </property>
+      <attribute name="verticalHeaderVisible">
+       <bool>false</bool>
+      </attribute>
      </widget>
      <widget class="QComboBox" name="coProdNameCbo">
       <property name="geometry">
@@ -130,7 +133,7 @@
      <attribute name="title">
       <string>Inventory</string>
      </attribute>
-     <widget class="QTableView" name="tableView">
+     <widget class="QTableView" name="invTbl">
       <property name="geometry">
        <rect>
         <x>495</x>
@@ -139,6 +142,9 @@
         <height>751</height>
        </rect>
       </property>
+      <attribute name="verticalHeaderVisible">
+       <bool>false</bool>
+      </attribute>
      </widget>
      <widget class="QGroupBox" name="groupBox">
       <property name="geometry">
@@ -152,19 +158,6 @@
       <property name="title">
        <string>Edit Product</string>
       </property>
-      <widget class="QLabel" name="label">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>20</y>
-         <width>71</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Product Name:</string>
-       </property>
-      </widget>
       <widget class="QLabel" name="label_2">
        <property name="geometry">
         <rect>
@@ -243,17 +236,7 @@
         <string>Vendor ID:</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lineEdit">
-       <property name="geometry">
-        <rect>
-         <x>90</x>
-         <y>20</y>
-         <width>171</width>
-         <height>20</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_2">
+      <widget class="QLineEdit" name="pdescLineEdit">
        <property name="geometry">
         <rect>
          <x>90</x>
@@ -263,7 +246,7 @@
         </rect>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lineEdit_3">
+      <widget class="QLineEdit" name="ppriceLineEdit">
        <property name="geometry">
         <rect>
          <x>90</x>
@@ -273,7 +256,7 @@
         </rect>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lineEdit_4">
+      <widget class="QLineEdit" name="pqtyLineEdit">
        <property name="geometry">
         <rect>
          <x>90</x>
@@ -283,7 +266,7 @@
         </rect>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lineEdit_5">
+      <widget class="QLineEdit" name="vidLineEdit">
        <property name="geometry">
         <rect>
          <x>90</x>
@@ -293,7 +276,7 @@
         </rect>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lineEdit_6">
+      <widget class="QLineEdit" name="pnameLineEdit">
        <property name="geometry">
         <rect>
          <x>90</x>
@@ -303,7 +286,7 @@
         </rect>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lineEdit_7">
+      <widget class="QLineEdit" name="pidLineEdit">
        <property name="geometry">
         <rect>
          <x>90</x>
@@ -320,43 +303,17 @@
         <x>10</x>
         <y>310</y>
         <width>271</width>
-        <height>281</height>
+        <height>191</height>
        </rect>
       </property>
       <property name="title">
        <string>Add Product</string>
       </property>
-      <widget class="QLabel" name="label_8">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>20</y>
-         <width>71</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Product Name:</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_9">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>50</y>
-         <width>71</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Product ID:</string>
-       </property>
-      </widget>
       <widget class="QLabel" name="label_10">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>80</y>
+         <y>30</y>
          <width>71</width>
          <height>16</height>
         </rect>
@@ -369,7 +326,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>110</y>
+         <y>60</y>
          <width>71</width>
          <height>16</height>
         </rect>
@@ -382,7 +339,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>140</y>
+         <y>90</y>
          <width>71</width>
          <height>16</height>
         </rect>
@@ -395,7 +352,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>170</y>
+         <y>120</y>
          <width>71</width>
          <height>16</height>
         </rect>
@@ -408,7 +365,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>200</y>
+         <y>150</y>
          <width>71</width>
          <height>16</height>
         </rect>
@@ -417,71 +374,51 @@
         <string>Vendor ID:</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lineEdit_8">
+      <widget class="QLineEdit" name="apdescLineEdit">
        <property name="geometry">
         <rect>
          <x>90</x>
-         <y>20</y>
+         <y>60</y>
          <width>171</width>
          <height>20</height>
         </rect>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lineEdit_9">
+      <widget class="QLineEdit" name="appriceLineEdit">
        <property name="geometry">
         <rect>
          <x>90</x>
-         <y>110</y>
+         <y>90</y>
          <width>171</width>
          <height>20</height>
         </rect>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lineEdit_10">
+      <widget class="QLineEdit" name="apqtyLineEdit">
        <property name="geometry">
         <rect>
          <x>90</x>
-         <y>140</y>
+         <y>120</y>
          <width>171</width>
          <height>20</height>
         </rect>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lineEdit_11">
+      <widget class="QLineEdit" name="avidLineEdit">
        <property name="geometry">
         <rect>
          <x>90</x>
-         <y>170</y>
+         <y>150</y>
          <width>171</width>
          <height>20</height>
         </rect>
        </property>
       </widget>
-      <widget class="QLineEdit" name="lineEdit_12">
+      <widget class="QLineEdit" name="apnameLineEdit">
        <property name="geometry">
         <rect>
          <x>90</x>
-         <y>200</y>
-         <width>171</width>
-         <height>20</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_13">
-       <property name="geometry">
-        <rect>
-         <x>90</x>
-         <y>80</y>
-         <width>171</width>
-         <height>20</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="lineEdit_14">
-       <property name="geometry">
-        <rect>
-         <x>90</x>
-         <y>50</y>
+         <y>30</y>
          <width>171</width>
          <height>20</height>
         </rect>
@@ -491,7 +428,12 @@
     </widget>
     <widget class="QWidget" name="tab_3">
      <attribute name="title">
-      <string>Page</string>
+      <string>Customers</string>
+     </attribute>
+    </widget>
+    <widget class="QWidget" name="tab_4">
+     <attribute name="title">
+      <string>Manager</string>
      </attribute>
     </widget>
    </widget>
