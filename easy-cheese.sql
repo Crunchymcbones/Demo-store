@@ -3,11 +3,10 @@ CREATE DATABASE easy_cheese;
 use easy_cheese;
 
 
-USE easy_cheese;
-
 CREATE TABLE customers (
     customer_id     INT             AUTO_INCREMENT      PRIMARY KEY,
-    name            VARCHAR(20)     NOT NULL,
+    first_name      VARCHAR(20)     NOT NULL,
+    last_name		VARCHAR(20)     NOT NULL,
     address         VARCHAR(100),
     email_address   VARCHAR(50)     NOT NULL,
     phone_number    VARCHAR(15)     NOT NULL
@@ -18,9 +17,8 @@ CREATE TABLE products (
     name            VARCHAR(20)     NOT NULL,
     product_desc    VARCHAR(100),
     vendor_id       INT             NOT NULL,
-    qty             INT             NOT NULL,
-    price           DECIMAL(9,2)    NOT NULL,
-    FOREIGN 
+    in_store_qty             INT             NOT NULL,
+    price           DECIMAL(9,2)    NOT NULL
 );
 
 CREATE TABLE invoices (
@@ -31,18 +29,18 @@ CONSTRAINT fk_customer_id FOREIGN KEY (customer_id) REFERENCES customers(custome
 );
 
 CREATE TABLE invoice_line_items (
-    invoice_id      INT             NOT NULL,
-    product_id      INT             NOT NULL,
+    invoice_id      INT             NOT NULL primary key,
+    product_id      INT             NOT NULL primary key,
     qty             INT             NOT NULL,
     CONSTRAINT invoice_product_pk PRIMARY KEY (invoice_id, product_id)
 );
 
-
-create table vendors (
-    vendor_id       INT             AUTO_INCREMENT      PRIMARY KEY,
-    vendor_name     VARCHAR(20)     NOT NULL
-);
 -- create views -- 
+create view complete_invoice as
+select i.invoice_id, concat(c.first_name, " ", c.last_name)
+from invoices i join customers c on i.customer_id = c.customer_id
+join invoice_line_items li on i.invoice_id = li.invoice_id
+join products p on li.product_id = p.product_id;
 
 -- sample data --
 INSERT INTO customers (name, address, email_address, phone_number)
@@ -55,6 +53,8 @@ INSERT INTO products (name, product_desc, vendor_id, qty, price)
 VALUES  ("brie",      "a soft disc of cheese",  1, 17, 10.99),
         ("cheddar",   "a sharp classic",        2, 50, 5.49),
         ("parmesian", "a hard italian cheese",  1, 10, 25.99);
+
+
 
 INSERT INTO invoices (invoice_id, customer_id, invoice_cost, date)
 VALUES  (1,3,287.76,"2023-03-27"),
