@@ -1,5 +1,7 @@
 DROP DATABASE IF EXISTS easy_cheese;
 CREATE DATABASE easy_cheese;
+use easy_cheese;
+
 
 CREATE TABLE customers (
     customer_id     INT             AUTO_INCREMENT      PRIMARY KEY,
@@ -15,25 +17,30 @@ CREATE TABLE products (
     product_desc    VARCHAR(100),
     vendor_id       INT             NOT NULL,
     qty             INT             NOT NULL,
-    price           DECIMAL(9,2)    NOT NULL
+    price           DECIMAL(9,2)    NOT NULL,
+    FOREIGN 
 );
 
 CREATE TABLE invoices (
     invoice_id      INT             AUTO_INCREMENT      PRIMARY KEY,
     customer_id     INT             NOT NULL,
-    invoice_cost    DECIMAL(9,2)    NOT NULL,
     date            DATETIME        NOT NULL,
 CONSTRAINT fk_customer_id FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
 );
 
 CREATE TABLE invoice_line_items (
-    id              INT             AUTO_INCREMENT      PRIMARY KEY,
     invoice_id      INT             NOT NULL,
     product_id      INT             NOT NULL,
     qty             INT             NOT NULL,
-CONSTRAINT invoice_id_fk foreign key (invoice_id) REFERENCES invoices(invoice_id),
-CONSTRAINT product_id_fk FOREIGN KEY (product_id) REFERENCES products(product_id)
+    CONSTRAINT invoice_product_pk PRIMARY KEY (invoice_id, product_id)
 );
+
+
+create table vendors (
+    vendor_id       INT             AUTO_INCREMENT      PRIMARY KEY,
+    vendor_name     VARCHAR(20)     NOT NULL
+);
+-- create views -- 
 
 -- sample data --
 INSERT INTO customers (name, address, email_address, phone_number)
