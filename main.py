@@ -71,7 +71,18 @@ class MainWindow(QMainWindow):
         pass
 
     def peditBtnClickHandler(self):
-        pass
+        pid = self.pidLineEdit.text()
+        name = self.pnameLineEdit.text()
+        desc = self.pdescLineEdit.text()
+        price = self.ppriceLineEdit.text()
+        pqty = self.pqtyLineEdit.text()
+        vid = self.vidLineEdit.text()
+
+        result = updateProduct(pid, name, desc, vid, pqty, price)
+        if result == 1:
+            print('Big PP')
+        else:
+            print('Small PP')
 
     def pdelBtnClickHandler(self):
         pass
@@ -113,12 +124,12 @@ class MainWindow(QMainWindow):
             pID = self.invPnameCbo.currentData()
             info = getProductNameByID(pID)
             print("info", info)
-            self.pidLineEdit.setText(str(info['pID']))
+            self.pidLineEdit.setText(str(info['prod_id']))
             self.pnameLineEdit.setText(info['name'])
             self.pdescLineEdit.setText(info['desc'])
-            self.ppriceLineEdit.setText(info['price'])
-            self.pqtyLineEdit.setText(info['qty'])
-            self.vidLineEdit.setText(info['vid'])
+            self.ppriceLineEdit.setText(str(info['price']))
+            self.pqtyLineEdit.setText(str(info['qty']))
+            self.vidLineEdit.setText(str(info['vid']))
         except Exception as e:
             print(e)
 
