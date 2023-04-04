@@ -1,7 +1,7 @@
 from mysql_functions import *
 
 def addProduct(pname, pdesc, vid, pqty, pprice):
-    sql = f"INSERT INTO `easy_cheese`.`products` (`name`, `product_desc`, `vendor_id`, `qty`, `price`) VALUES ('{pname}', '{pdesc}', '{vid}', '{pqty}', '{pprice}');"
+    sql = f"INSERT INTO `easy_cheese`.`products` (`name`, `product_desc`, `vendor_id`, `in_store_qty`, `price`) VALUES ('{pname}', '{pdesc}', '{vid}', '{pqty}', '{pprice}');"
     return executeQueryAndCommit(sql)
 
 
@@ -25,7 +25,7 @@ def getProductIdsAndNames():
 
 
 def updateProduct(pid, name, desc, vid, qty, price):
-    sql = f"UPDATE `easy_cheese`.`products` SET name = '{name}', product_desc = '{desc}', vendor_id = {vid}, qty = {qty}, price = {price} where product_id = {pid};"
+    sql = f"UPDATE `easy_cheese`.`products` SET name = '{name}', product_desc = '{desc}', vendor_id = {vid}, in_store_qty = {qty}, price = {price} where product_id = {pid};"
     return executeQueryAndCommit(sql)
 
 

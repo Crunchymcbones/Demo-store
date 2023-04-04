@@ -35,7 +35,9 @@ class MainWindow(QMainWindow):
         self.pqtyLineEdit = self.findChild(QLineEdit, 'pqtyLineEdit')
         self.vidLineEdit = self.findChild(QLineEdit, 'vidLineEdit')
         self.peditBtn = self.findChild(QPushButton, 'peditBtn')
+        self.peditBtn.clicked.connect(self.peditBtnClickHandler)
         self.pdelBtn = self.findChild(QPushButton, 'pdelBtn')
+        self.pdelBtn.clicked.connect(self.pdelBtnClickHandler)
 
         # Table
         self.invTbl = self.findChild(QTableWidget, 'invTbl')
@@ -87,6 +89,8 @@ class MainWindow(QMainWindow):
 
         result = updateProduct(pid, name, desc, vid, pqty, price)
         if result == 1:
+            self.refreshProductTable()
+            self.refreshProductComboBox()
             print('Big PP')
         else:
             print('Small PP')
@@ -105,8 +109,8 @@ class MainWindow(QMainWindow):
                 pid = self.pidLineEdit.text()
                 result = deleteProductById(pid)
                 if result == 1:
-                    self.refreshStudentTab()
-                    self.refreshUpdateStudent()
+                    self.refreshProductTable()
+                    self.refreshProductComboBox()
                 else:
                     print('Skill issue')
             elif button == QMessageBox.StandardButton.No:
@@ -132,6 +136,8 @@ class MainWindow(QMainWindow):
         result = addProduct(pname, pdesc, vid, pqty, pprice)
 
         if result == 1:
+            self.refreshProductTable()
+            self.refreshProductComboBox()
             print('You have big PP')
         else:
             print('You have small PP')
