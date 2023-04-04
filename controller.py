@@ -27,3 +27,8 @@ def getProductIdsAndNames():
 def updateProduct(pid, name, desc, vid, qty, price):
     sql = f"UPDATE `easy_cheese`.`products` SET name = '{name}', product_desc = '{desc}', vendor_id = {vid}, qty = {qty}, price = {price} where product_id = {pid};"
     return executeQueryAndCommit(sql)
+
+
+def deleteProductById(pid):
+    sql = f"DELETE FROM `easy_cheese`.`products` where product_id = {pid};"
+    return executeQueryAndCommit(sql)
