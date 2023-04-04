@@ -24,7 +24,7 @@ This software has the following prerequisites
 
 ## Getting Started <a name = "getting_started"></a>
 
-To install the system and get the GUI running follow these 3 steps.
+To install the system and get the GUI running follow these 4 steps.
 
 > Step1: Run "git clone https://github.com/Crunchymcbones/Demo-store.git"
 
