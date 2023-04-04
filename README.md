@@ -37,4 +37,4 @@ To install the system and get the GUI running follow these 4 steps.
 
 ## Usage <a name = "usage"></a>
 
-After installing and running the above commands and files your system should be running and usable. Feels free to modify and use the code for the system however you want.
+After installing and running the above commands and files your system should be running and usable. Feel free to modify and use the code for the system however you want.
