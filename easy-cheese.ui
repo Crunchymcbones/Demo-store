@@ -133,19 +133,6 @@
      <attribute name="title">
       <string>Inventory</string>
      </attribute>
-     <widget class="QTableView" name="invTbl">
-      <property name="geometry">
-       <rect>
-        <x>495</x>
-        <y>10</y>
-        <width>571</width>
-        <height>751</height>
-       </rect>
-      </property>
-      <attribute name="verticalHeaderVisible">
-       <bool>false</bool>
-      </attribute>
-     </widget>
      <widget class="QGroupBox" name="groupBox">
       <property name="geometry">
        <rect>
@@ -486,6 +473,19 @@
         <string>Add Product</string>
        </property>
       </widget>
+     </widget>
+     <widget class="QTableWidget" name="invTbl">
+      <property name="geometry">
+       <rect>
+        <x>475</x>
+        <y>10</y>
+        <width>621</width>
+        <height>811</height>
+       </rect>
+      </property>
+      <attribute name="verticalHeaderVisible">
+       <bool>false</bool>
+      </attribute>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_3">
