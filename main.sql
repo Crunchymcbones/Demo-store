@@ -1,4 +1,9 @@
 DROP DATABASE IF EXISTS easy_cheese;
+
+--*********************** 
+--* CREATE THE DATABASE *
+--***********************
+
 CREATE DATABASE easy_cheese;
 use easy_cheese;
 
@@ -19,7 +24,7 @@ CREATE TABLE products (
     product_desc    VARCHAR(100),
     vendor_id       INT             NOT NULL,
     in_store_qty    INT             NOT NULL,
-    price           DECIMAL(9,2)    NOT NULL
+    price           DECIMAL(9,2)    NOT NULL,
 );
 
 -- create the invoices table
@@ -29,7 +34,6 @@ CREATE TABLE invoices (
     date            DATETIME        NOT NULL,
 CONSTRAINT fk_customer_id FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
 );
-
 
 -- intermediary table for invoices & products --
 CREATE TABLE invoice_line_items (
@@ -56,9 +60,24 @@ FROM
 	JOIN products as p ON li.product_id = p.product_id
 GROUP BY 
 	i.invoice_id;
-    
+
+-- create stored procedures --
+delimiter //
+create procedure active_customers (months int)
+begin
+select 
+	concat(c.last_name, ", ", c.first_name) as 'customer', 
+	date(max(i.date)) as 'last active'
+from 
+	customers c join invoices i on c.customer_id = i.customer_id 
+where 
+	timestampdiff(month,i.date,date(now())) > 6
+group by concat(c.last_name, ", ", c.first_name);
+end //
+delimiter ;
+   
 -- *****************
--- *  sample data  *
+-- *  SAMPLE DATA  *
 -- *****************
 
 -- sample data for customers --
@@ -85,8 +104,6 @@ VALUES
 	('Derron','Pavlenko','9AmericanAshTrail','dpavlenkoe@barnesandnoble.com','383-459-1983'),
 	('Eleonora','Bunce','57GolfViewParkway','ebuncef@ed.gov','365-572-4146');
         
-
-
 -- sample data for products --
 INSERT INTO products (name, product_desc, vendor_id, in_store_qty, price)
 VALUES  
@@ -95,20 +112,20 @@ VALUES
 	("parmesian","aharditaliancheese",1,10,25.99),
 	('QuesoMajorero','placeratante',4,39,2.95),
 	('Northumberland','suscipitafeugiat',9,4,4.36),
-	('Kikorangi','justositametsapiendigni',14,86,1.51),
-	('Selva','erattortorsollicitudinmisitametlobortis',12,25,1.02),
+	('Kikorangi','justositametsapiendigni',3,86,1.51),
+	('Selva','erattortorsollicitudinmisitametlobortis',6,25,1.02),
 	('Beauvoorde','interdummauris',8,88,9.94),
 	('MozzarellaFresh','quamfringillarhoncus',6,18,1.16),
 	('LlanglofanFarmhouse','pedejusto',1,43,1.36),
 	('Friesla','tinciduntlacusatvelitvivamusvelnulla',9,19,4.58),
 	('Anthoriro','phasellusinfelisdonecsempersapiena',4,64,1.65),
-	('DreuxalaFeuille','ultricesposuerecubiliacurae',14,45,4.10),
+	('DreuxalaFeuille','ultricesposuerecubiliacurae',3,45,4.10),
 	('Rustinu','nullammolestienibhinlectuspellentesqueat',7,54,8.04),
-	('SomersetBrie','suscipitafeugiateterosvestibulum',11,5,6.03),
+	('SomersetBrie','suscipitafeugiateterosvestibulum',5,5,6.03),
 	('Civray','euminullaacenimin',3,71,3.15),
 	('Cheddar','dapibusdolor',7,33,6.02),
-	('FreshTruffles','tortorduismattisegestasmetusaenean',11,87,9.75),
-	('Chaource','vehiculacondimentumcurabiturinlibero',14,85,1.46),
+	('FreshTruffles','tortorduismattisegestasmetusaenean',5,87,9.75),
+	('Chaource','vehiculacondimentumcurabiturinlibero',3,85,1.46),
 	('Acorn','fermentumjustoneccondimentum',8,46,5.93);
 
 -- sample data for invoices --
