@@ -24,6 +24,32 @@ class MainWindow(QMainWindow):
         self.coDeleteBtn = self.findChild(QPushButton, 'coDeleteBtn')
         self.coCOnfirmBtn = self.findChild(QPushButton, 'coCOnfirmBtn')
         self.coTbl = self.findChild(QTableWidget, 'coTbl')
+        self.coQtyBO.valueChanged.connect(self.addToTableBtnClickedHandler)
+
+        colNames, rows = getProductIdsAndNames()
+        print(colNames, rows)
+        for row in rows:
+            self.coProdNameCbo.addItem(row[1], userData=row[0])
+        self.coProdNameCbo.currentIndexChanged.connect(self.checkInfoCurrentIndexChangedHandler)
+        self.refreshCheckoutComboBox()
+
+    def addToTableBtnClickedHandler(self):
+        value = self.coQtyBO.value()
+        print("Value : " + str(value))
+        self.refreshCheckoutComboBox()
+
+        pID = self.coProdNameCbo.currentData()
+        info = getProductNameByID(pID)
+
+        cpName = (info['name'])
+        cpprice = (str(info['price']))
+        cpqty = (str(info['qty']))
+
+        self.coTbl = QTableWidget(5, 3)
+        self.coTbl.setHorizontalHeaderLabels(['Product Name', 'Product Price', 'Product Quantity'])
+        # table.setItem(i, j, QTableWidgetItem(str(row[j])))
+
+
 
     def initializeInventory(self):
         # Edit Product
@@ -107,7 +133,7 @@ class MainWindow(QMainWindow):
             button = msg.exec()
             if button == QMessageBox.StandardButton.Yes:
                 pid = self.pidLineEdit.text()
-                result = deleteProductById(pid)
+                result = deleteProduct(pid)
                 if result == 1:
                     self.refreshProductTable()
                     self.refreshProductComboBox()
@@ -167,8 +193,20 @@ class MainWindow(QMainWindow):
         except Exception as e:
             print(e)
 
+
+    def refreshCheckoutComboBox(self):
+        try:
+            pID = self.coProdNameCbo.currentData()
+            info = getProductNameByID(pID)
+            print("info", info)
+        except Exception as e:
+            print(e)
+
     def productInfoCurrentIndexChangedHandler(self):
         self.refreshProductComboBox()
+
+    def checkInfoCurrentIndexChangedHandler(self):
+        self.refreshCheckoutComboBox()
 
     def initializeAllProductsTable(self):
         self.invTbl = self.findChild(QTableWidget, 'invTbl')
