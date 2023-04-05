@@ -14,7 +14,7 @@ def addProduct(pname, pdesc, vid, pqty, pprice):
     Returns:
     bool: True if the addition was successful, False otherwise.
     """
-    sql = f"INSERT INTO `easy_cheese`.`products` (`name`, `product_desc`, `vendor_id`, `in_store_in_store_qty`, `price`) VALUES ('{pname}', '{pdesc}', '{vid}', '{pqty}', '{pprice}');"
+    sql = f"INSERT INTO `easy_cheese`.`products` (`name`, `product_desc`, `vendor_id`, `in_store_qty`, `price`) VALUES ('{pname}', '{pdesc}', '{vid}', '{pqty}', '{pprice}');"
     return executeQueryAndCommit(sql)
 
 def getAllProducts():
