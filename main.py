@@ -2,6 +2,7 @@ import sys
 
 from PyQt6 import uic
 from PyQt6.QtWidgets import *
+import winsound
 
 from controller import *
 
@@ -34,9 +35,11 @@ class MainWindow(QMainWindow):
         self.pqtyLineEdit = self.findChild(QLineEdit, 'pqtyLineEdit')
         self.vidLineEdit = self.findChild(QLineEdit, 'vidLineEdit')
         self.peditBtn = self.findChild(QPushButton, 'peditBtn')
+        self.peditBtn.clicked.connect(self.peditBtnClickHandler)
         self.pdelBtn = self.findChild(QPushButton, 'pdelBtn')
+        self.pdelBtn.clicked.connect(self.pdelBtnClickHandler)
 
-        #Table
+        # Table
         self.invTbl = self.findChild(QTableWidget, 'invTbl')
 
         # Add Product
@@ -48,13 +51,19 @@ class MainWindow(QMainWindow):
         self.aaddProductBtn = self.findChild(QPushButton, 'aaddProductBtn')
         self.aaddProductBtn.clicked.connect(self.aaddProductBtnClickHandler)
 
-
         colNames, rows = getProductIdsAndNames()
         print(colNames, rows)
         for row in rows:
             self.invPnameCbo.addItem(row[1], userData=row[0])
         self.invPnameCbo.currentIndexChanged.connect(self.productInfoCurrentIndexChangedHandler)
         self.refreshProductComboBox()
+
+
+    def refreshProductTable(self):
+        colNames, data = getAllProducts()
+        self.displayDataInTable(colNames, data, self.invTbl)
+
+
     def coAddBtnClickHandler(self):
         pass
 
@@ -80,12 +89,37 @@ class MainWindow(QMainWindow):
 
         result = updateProduct(pid, name, desc, vid, pqty, price)
         if result == 1:
+            self.refreshProductTable()
+            self.refreshProductComboBox()
             print('Big PP')
         else:
             print('Small PP')
 
     def pdelBtnClickHandler(self):
-        pass
+        try:
+            name = self.pnameLineEdit.text()
+            msg = QMessageBox(self)
+            msg.setWindowTitle("Delete Confirmation")
+            msg.setText(f"Are you sure you want to delete {name}")
+            msg.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+            msg.setIcon(QMessageBox.Icon.Question)
+            winsound.PlaySound("SystemExit", winsound.SND_ALIAS)
+            button = msg.exec()
+            if button == QMessageBox.StandardButton.Yes:
+                pid = self.pidLineEdit.text()
+                result = deleteProductById(pid)
+                if result == 1:
+                    self.refreshProductTable()
+                    self.refreshProductComboBox()
+                else:
+                    print('Skill issue')
+            elif button == QMessageBox.StandardButton.No:
+                print('Your a weiner')
+
+
+        except Exception as e:
+            if "1451 (23000): " in str(e):
+                self.lblModifyStuFeedback.setText('First Delete Enrollments')
 
     def aaddProductBtnClickHandler(self):
         pname = self.apnameLineEdit.text()
@@ -102,12 +136,13 @@ class MainWindow(QMainWindow):
         result = addProduct(pname, pdesc, vid, pqty, pprice)
 
         if result == 1:
+            self.refreshProductTable()
+            self.refreshProductComboBox()
             print('You have big PP')
         else:
             print('You have small PP')
 
-
-    def displayDataInTable(self, columns, rows, table:QTableWidget):
+    def displayDataInTable(self, columns, rows, table: QTableWidget):
         table.setRowCount(len(rows))
         table.setColumnCount(len(columns))
         for i in range(len(rows)):
@@ -117,7 +152,6 @@ class MainWindow(QMainWindow):
         columns = ['pid', 'name', 'desc', 'vid', 'qty', 'price']
         for i in range(table.columnCount()):
             table.setHorizontalHeaderItem(i, QTableWidgetItem(f'{columns[i]}'))
-
 
     def refreshProductComboBox(self):
         try:
@@ -133,10 +167,8 @@ class MainWindow(QMainWindow):
         except Exception as e:
             print(e)
 
-
     def productInfoCurrentIndexChangedHandler(self):
         self.refreshProductComboBox()
-
 
     def initializeAllProductsTable(self):
         self.invTbl = self.findChild(QTableWidget, 'invTbl')
