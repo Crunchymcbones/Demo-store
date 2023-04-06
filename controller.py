@@ -67,7 +67,7 @@ def updateProduct(pid, name, desc, vid, qty, price):
     Returns:
     bool: True if the update was successful, False otherwise.
     """
-    sql = f"UPDATE `easy_cheese`.`products` SET name = '{name}', product_desc = '{desc}', vendor_id = {vid}, qty = {qty}, price = {price} where product_id = {pid};"
+    sql = f"UPDATE `easy_cheese`.`products` SET name = '{name}', product_desc = '{desc}', vendor_id = {vid}, in_store_qty = {qty}, price = {price} where product_id = {pid};"
     return executeQueryAndCommit(sql)
 
 def deleteProduct(pid):

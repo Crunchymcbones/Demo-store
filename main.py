@@ -2,6 +2,7 @@ import sys
 
 from PyQt6 import uic
 from PyQt6.QtWidgets import *
+from PyQt6.QtCore import *
 import winsound
 
 from controller import *
@@ -34,25 +35,28 @@ class MainWindow(QMainWindow):
         self.refreshCheckoutComboBox()
 
     def addToTableBtnClickedHandler(self):
-        price = 0
+        rowPosition = self.coTbl.rowCount()
         pID = self.coProdNameCbo.currentData()
         info = getProductNameByID(pID)
         qty = self.coQtyBO.value()
 
-        rowPosition = self.coTbl.rowCount()
-        self.coTbl.insertRow(rowPosition)
-        self.coTbl.setColumnCount(3)
+        matching_items = self.coTbl.findItems(info['name'], Qt.MatchFlag.MatchContains)
+        if matching_items:
+            for column in range(3):
+                for row in range(rowPosition):
+                    item = self.coTbl.item(row, column).text()
+                    if info['name'] == item:
+                        product_quantity = int(self.coTbl.item(row, 1).text())
+                        new_product_quantity = product_quantity + qty
+                        self.coTbl.setItem(row, 1, QTableWidgetItem(str(new_product_quantity)))
+        else:
+            self.coTbl.insertRow(rowPosition)
+            self.coTbl.setColumnCount(3)
 
-        self.coTbl.setItem(rowPosition, 0, QTableWidgetItem(info['name']))
-        self.coTbl.setItem(rowPosition, 1, QTableWidgetItem(str(qty)))
-        self.coTbl.setItem(rowPosition, 2, QTableWidgetItem(str(info['price'])))
+            self.coTbl.setItem(rowPosition, 0, QTableWidgetItem(info['name']))
+            self.coTbl.setItem(rowPosition, 1, QTableWidgetItem(str(qty)))
+            self.coTbl.setItem(rowPosition, 2, QTableWidgetItem(str(info['price'])))
 
-        for row in range(0, rowPosition):
-            price1 = float(self.coTbl.item(row, 2).text())
-            quantity1 = int(self.coTbl.item(row, 1).text())
-            total1 = price1 * quantity1
-            price += total1
-            self.lblCoTotal.setText(str(price))
 
     def initializeInventory(self):
         # Edit Product
