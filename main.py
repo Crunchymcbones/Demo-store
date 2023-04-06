@@ -47,9 +47,12 @@ class MainWindow(QMainWindow):
         self.coTbl.setItem(rowPosition, 1, QTableWidgetItem(str(qty)))
         self.coTbl.setItem(rowPosition, 2, QTableWidgetItem(str(info['price'])))
 
-        price += qty * info['price']
-
-        self.lblCoTotal.setText(str(price))
+        for row in range(0, rowPosition):
+            price1 = float(self.coTbl.item(row, 2).text())
+            quantity1 = int(self.coTbl.item(row, 1).text())
+            total1 = price1 * quantity1
+            price += total1
+            self.lblCoTotal.setText(str(price))
 
     def initializeInventory(self):
         # Edit Product
