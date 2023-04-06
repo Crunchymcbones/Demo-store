@@ -19,12 +19,12 @@ class MainWindow(QMainWindow):
         self.coProdNameCbo = self.findChild(QComboBox, 'coProdNameCbo')
         self.coQtyBO = self.findChild(QSpinBox, 'coQtyBO')
         self.coAddBtn = self.findChild(QPushButton, 'coAddBtn')
+        self.coAddBtn.clicked.connect(self.addToTableBtnClickedHandler)
         self.coUpBtn = self.findChild(QPushButton, 'coUpBtn')
         self.coDownBtn = self.findChild(QPushButton, 'coDownBtn')
         self.coDeleteBtn = self.findChild(QPushButton, 'coDeleteBtn')
         self.coCOnfirmBtn = self.findChild(QPushButton, 'coCOnfirmBtn')
         self.coTbl = self.findChild(QTableWidget, 'coTbl')
-        self.coQtyBO.valueChanged.connect(self.addToTableBtnClickedHandler)
 
         colNames, rows = getProductIdsAndNames()
         print(colNames, rows)
@@ -34,22 +34,18 @@ class MainWindow(QMainWindow):
         self.refreshCheckoutComboBox()
 
     def addToTableBtnClickedHandler(self):
-        value = self.coQtyBO.value()
-        print("Value : " + str(value))
-        self.refreshCheckoutComboBox()
-
         pID = self.coProdNameCbo.currentData()
         info = getProductNameByID(pID)
 
-        cpName = (info['name'])
-        cpprice = (str(info['price']))
-        cpqty = (str(info['qty']))
+        rowPosition = self.coTbl.rowCount()
+        self.coTbl.insertRow(rowPosition)
+        self.coTbl.setColumnCount(3)
 
-        self.coTbl = QTableWidget(5, 3)
-        self.coTbl.setHorizontalHeaderLabels(['Product Name', 'Product Price', 'Product Quantity'])
-        # table.setItem(i, j, QTableWidgetItem(str(row[j])))
+        self.coTbl.setItem(rowPosition, 0, QTableWidgetItem(info['name']))
+        self.coTbl.setItem(rowPosition, 1, QTableWidgetItem(self.coQtyBO.value()))
+        self.coTbl.setItem(rowPosition, 2, QTableWidgetItem(str(info['price'])))
 
-
+        print(self.coQtyBO.value())
 
     def initializeInventory(self):
         # Edit Product
@@ -84,11 +80,9 @@ class MainWindow(QMainWindow):
         self.invPnameCbo.currentIndexChanged.connect(self.productInfoCurrentIndexChangedHandler)
         self.refreshProductComboBox()
 
-
     def refreshProductTable(self):
         colNames, data = getAllProducts()
         self.displayDataInTable(colNames, data, self.invTbl)
-
 
     def coAddBtnClickHandler(self):
         pass
@@ -192,7 +186,6 @@ class MainWindow(QMainWindow):
             self.vidLineEdit.setText(str(info['vid']))
         except Exception as e:
             print(e)
-
 
     def refreshCheckoutComboBox(self):
         try:
