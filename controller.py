@@ -82,3 +82,12 @@ def deleteProduct(pid):
     """
     sql = f"delete from `easy_cheese`.`products` where product_id = {pid};"
     return executeQueryAndCommit(sql)
+
+def removeInStoreQuantity(pid, new_qty_value):
+    sql = f"UPDATE `easy_cheese`.`products` SET in_store_qty = {new_qty_value} where product_id = {pid};"
+    return executeQueryAndCommit(sql)
+
+def getProductQtyByName(product_name):
+    sql = f"select product_id, in_store_qty from `easy_cheese`.`products` where name = '{product_name}';"
+    return executeQueryAndReturnResult(sql)
+
