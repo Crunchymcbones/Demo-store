@@ -44,25 +44,35 @@ class MainWindow(QMainWindow):
         pID = self.coProdNameCbo.currentData()
         info = getProductNameByID(pID)
         qty = self.coQtyBO.value()
+        overall_total = 0
+        qtyPrice = []
 
         matching_items = self.coTbl.findItems(info['name'], Qt.MatchFlag.MatchContains)
         if matching_items:
-            for column in range(3):
-                for row in range(rowPosition):
-                    item = self.coTbl.item(row, column).text()
-                    if info['name'] == item:
-                        product_quantity = int(self.coTbl.item(row, 1).text())
-                        new_product_quantity = product_quantity + qty
-                        self.coTbl.setItem(row, 1, QTableWidgetItem(str(new_product_quantity)))
+            for row in range(rowPosition):
+                item = self.coTbl.item(row, 0).text()
+                if info['name'] == item:
+                    product_quantity = int(self.coTbl.item(row, 1).text())
+                    new_product_quantity = product_quantity + qty
+                    self.coTbl.setItem(row, 1, QTableWidgetItem(str(new_product_quantity)))
+                    product_total = new_product_quantity * info['price']
+                    self.coTbl.setItem(row, 2, QTableWidgetItem(str(product_total)))
         else:
             self.coTbl.insertRow(rowPosition)
             self.coTbl.setColumnCount(3)
 
+            product_total = qty * info['price']
+
             self.coTbl.setItem(rowPosition, 0, QTableWidgetItem(info['name']))
             self.coTbl.setItem(rowPosition, 1, QTableWidgetItem(str(qty)))
-            self.coTbl.setItem(rowPosition, 2, QTableWidgetItem(str(info['price'])))
+            self.coTbl.setItem(rowPosition, 2, QTableWidgetItem(str(product_total)))
+            for i in range(rowPosition):
+                qtyPrice.append([self.coTbl.item(i, 0).text(), self.coTbl.item(i, 2).text()])
 
+            for i in qtyPrice:
+                overall_total += float(i[1])
 
+            self.lblCoTotal.setText(str(round(overall_total, 2)))
     def initializeInventory(self):
         # Edit Product
         self.invPnameCbo = self.findChild(QComboBox, 'invPnameCbo')
@@ -103,7 +113,17 @@ class MainWindow(QMainWindow):
         self.displayDataInTable(colNames, data, self.invTbl)
 
     def coDeleteBtnClickHandler(self):
+        qtyPrice = []
+        overall_total = 0
+
         self.coTbl.removeRow(self.coTbl.currentRow())
+        for i in range(self.coTbl.rowCount()):
+            qtyPrice.append([self.coTbl.item(i, 0).text(), self.coTbl.item(i, 2).text()])
+
+        for i in qtyPrice:
+            overall_total += float(i[1])
+        self.lblCoTotal.setText(str(round(overall_total, 2)))
+
         print('Item Deleted')
 
     def coCOnfirmClickHandler(self):
