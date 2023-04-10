@@ -2,6 +2,7 @@ import sys
 
 from PyQt6 import uic
 from PyQt6.QtWidgets import *
+from PyQt6.QtCore import *
 import winsound
 
 from controller import *
@@ -17,14 +18,61 @@ class MainWindow(QMainWindow):
 
     def initializeCheckoutWindow(self):
         self.coProdNameCbo = self.findChild(QComboBox, 'coProdNameCbo')
+        self.lblCoTotal = self.findChild(QLabel, 'lblCoTotal')
         self.coQtyBO = self.findChild(QSpinBox, 'coQtyBO')
         self.coAddBtn = self.findChild(QPushButton, 'coAddBtn')
-        self.coUpBtn = self.findChild(QPushButton, 'coUpBtn')
-        self.coDownBtn = self.findChild(QPushButton, 'coDownBtn')
+        self.coAddBtn.clicked.connect(self.addToTableBtnClickedHandler)
         self.coDeleteBtn = self.findChild(QPushButton, 'coDeleteBtn')
+        self.coDeleteBtn.clicked.connect(self.coDeleteBtnClickHandler)
         self.coCOnfirmBtn = self.findChild(QPushButton, 'coCOnfirmBtn')
+        self.coCOnfirmBtn.clicked.connect(self.coCOnfirmClickHandler)
         self.coTbl = self.findChild(QTableWidget, 'coTbl')
+        self.coTbl.setColumnCount(3)
+        self.coTbl.setHorizontalHeaderItem(0, QTableWidgetItem(f'Product Name'))
+        self.coTbl.setHorizontalHeaderItem(1, QTableWidgetItem(f'Product Quantity'))
+        self.coTbl.setHorizontalHeaderItem(2, QTableWidgetItem(f'Product Price'))
 
+        colNames, rows = getProductIdsAndNames()
+        print(colNames, rows)
+        for row in rows:
+            self.coProdNameCbo.addItem(row[1], userData=row[0])
+        self.coProdNameCbo.currentIndexChanged.connect(self.checkInfoCurrentIndexChangedHandler)
+        self.refreshCheckoutComboBox()
+
+    def addToTableBtnClickedHandler(self):
+        rowPosition = self.coTbl.rowCount()
+        pID = self.coProdNameCbo.currentData()
+        info = getProductNameByID(pID)
+        qty = self.coQtyBO.value()
+        overall_total = 0
+        qtyPrice = []
+
+        matching_items = self.coTbl.findItems(info['name'], Qt.MatchFlag.MatchContains)
+        if matching_items:
+            for row in range(rowPosition):
+                item = self.coTbl.item(row, 0).text()
+                if info['name'] == item:
+                    product_quantity = int(self.coTbl.item(row, 1).text())
+                    new_product_quantity = product_quantity + qty
+                    self.coTbl.setItem(row, 1, QTableWidgetItem(str(new_product_quantity)))
+                    product_total = new_product_quantity * info['price']
+                    self.coTbl.setItem(row, 2, QTableWidgetItem(str(product_total)))
+        else:
+            self.coTbl.insertRow(rowPosition)
+            self.coTbl.setColumnCount(3)
+
+            product_total = qty * info['price']
+
+            self.coTbl.setItem(rowPosition, 0, QTableWidgetItem(info['name']))
+            self.coTbl.setItem(rowPosition, 1, QTableWidgetItem(str(qty)))
+            self.coTbl.setItem(rowPosition, 2, QTableWidgetItem(str(product_total)))
+            for i in range(rowPosition):
+                qtyPrice.append([self.coTbl.item(i, 0).text(), self.coTbl.item(i, 2).text()])
+
+            for i in qtyPrice:
+                overall_total += float(i[1])
+
+            self.lblCoTotal.setText(str(round(overall_total, 2)))
     def initializeInventory(self):
         # Edit Product
         self.invPnameCbo = self.findChild(QComboBox, 'invPnameCbo')
@@ -34,6 +82,8 @@ class MainWindow(QMainWindow):
         self.ppriceLineEdit = self.findChild(QLineEdit, 'ppriceLineEdit')
         self.pqtyLineEdit = self.findChild(QLineEdit, 'pqtyLineEdit')
         self.vidLineEdit = self.findChild(QLineEdit, 'vidLineEdit')
+        self.lblEditDeleteProd = self.findChild(QLabel, 'lblEditDeleteProd')
+        self.lblAddProd = self.findChild(QLabel, 'lblAddProd')
         self.peditBtn = self.findChild(QPushButton, 'peditBtn')
         self.peditBtn.clicked.connect(self.peditBtnClickHandler)
         self.pdelBtn = self.findChild(QPushButton, 'pdelBtn')
@@ -58,26 +108,47 @@ class MainWindow(QMainWindow):
         self.invPnameCbo.currentIndexChanged.connect(self.productInfoCurrentIndexChangedHandler)
         self.refreshProductComboBox()
 
-
     def refreshProductTable(self):
         colNames, data = getAllProducts()
         self.displayDataInTable(colNames, data, self.invTbl)
 
-
-    def coAddBtnClickHandler(self):
-        pass
-
-    def coUpBtnClickHandler(self):
-        pass
-
-    def coDownBtnClickHandler(self):
-        pass
-
     def coDeleteBtnClickHandler(self):
-        pass
+        qtyPrice = []
+        overall_total = 0
+
+        self.coTbl.removeRow(self.coTbl.currentRow())
+        for i in range(self.coTbl.rowCount()):
+            qtyPrice.append([self.coTbl.item(i, 0).text(), self.coTbl.item(i, 2).text()])
+
+        for i in qtyPrice:
+            overall_total += float(i[1])
+        self.lblCoTotal.setText(str(round(overall_total, 2)))
+
+        print('Item Deleted')
 
     def coCOnfirmClickHandler(self):
-        pass
+        rowPosition = self.coTbl.rowCount()
+        information = []
+
+        for row in range(rowPosition):
+            name = self.coTbl.item(row, 0).text()
+            qty = self.coTbl.item(row, 1).text()
+            information.append({name: qty})
+            in_store_qty = getProductQtyByName(name)[1][0][1]
+            pid = getProductQtyByName(name)[1][0][0]
+            updated_qty = int(in_store_qty) - int(qty)
+            print(updated_qty)
+            result = removeInStoreQuantity(pid, updated_qty)
+            if result == 1:
+                self.refreshProductTable()
+                self.refreshProductComboBox()
+                self.coTbl.clear()
+                self.coTbl.setRowCount(0)
+                self.coTbl.setColumnCount(3)
+                self.coTbl.setHorizontalHeaderItem(0, QTableWidgetItem(f'Product Name'))
+                self.coTbl.setHorizontalHeaderItem(1, QTableWidgetItem(f'Product Quantity'))
+                self.coTbl.setHorizontalHeaderItem(2, QTableWidgetItem(f'Product Price'))
+            print(information)
 
     def peditBtnClickHandler(self):
         pid = self.pidLineEdit.text()
@@ -91,9 +162,9 @@ class MainWindow(QMainWindow):
         if result == 1:
             self.refreshProductTable()
             self.refreshProductComboBox()
-            print('Big PP')
+            self.lblEditDeleteProd.setText('Product edited successfully!')
         else:
-            print('Small PP')
+            self.lblEditDeleteProd.setText('Product could not be edited... Please try again.')
 
     def pdelBtnClickHandler(self):
         try:
@@ -107,19 +178,20 @@ class MainWindow(QMainWindow):
             button = msg.exec()
             if button == QMessageBox.StandardButton.Yes:
                 pid = self.pidLineEdit.text()
-                result = deleteProductById(pid)
+                result = deleteProduct(pid)
                 if result == 1:
+                    self.lblEditDeleteProd.setText('Product deleted successfully!')
                     self.refreshProductTable()
                     self.refreshProductComboBox()
                 else:
-                    print('Skill issue')
+                    self.lblEditDeleteProd.setText('Product could not be deleted... please try again.')
             elif button == QMessageBox.StandardButton.No:
-                print('Your a weiner')
+                self.lblEditDeleteProd.setText('Product deletion canceled.')
 
 
         except Exception as e:
             if "1451 (23000): " in str(e):
-                self.lblModifyStuFeedback.setText('First Delete Enrollments')
+                self.lblEditDeleteProd.setText(e)
 
     def aaddProductBtnClickHandler(self):
         pname = self.apnameLineEdit.text()
@@ -138,9 +210,9 @@ class MainWindow(QMainWindow):
         if result == 1:
             self.refreshProductTable()
             self.refreshProductComboBox()
-            print('You have big PP')
+            self.lblAddProd.setText('Product added successfully!')
         else:
-            print('You have small PP')
+            self.lblAddProd.setText('Product could not be added... Please try again.')
 
     def displayDataInTable(self, columns, rows, table: QTableWidget):
         table.setRowCount(len(rows))
@@ -167,8 +239,19 @@ class MainWindow(QMainWindow):
         except Exception as e:
             print(e)
 
+    def refreshCheckoutComboBox(self):
+        try:
+            pID = self.coProdNameCbo.currentData()
+            info = getProductNameByID(pID)
+            print("info", info)
+        except Exception as e:
+            print(e)
+
     def productInfoCurrentIndexChangedHandler(self):
         self.refreshProductComboBox()
+
+    def checkInfoCurrentIndexChangedHandler(self):
+        self.refreshCheckoutComboBox()
 
     def initializeAllProductsTable(self):
         self.invTbl = self.findChild(QTableWidget, 'invTbl')

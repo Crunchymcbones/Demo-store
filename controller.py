@@ -67,7 +67,7 @@ def updateProduct(pid, name, desc, vid, qty, price):
     Returns:
     bool: True if the update was successful, False otherwise.
     """
-    sql = f"UPDATE `easy_cheese`.`products` SET name = '{name}', product_desc = '{desc}', vendor_id = {vid}, qty = {qty}, price = {price} where product_id = {pid};"
+    sql = f"UPDATE `easy_cheese`.`products` SET name = '{name}', product_desc = '{desc}', vendor_id = {vid}, in_store_qty = {qty}, price = {price} where product_id = {pid};"
     return executeQueryAndCommit(sql)
 
 def deleteProduct(pid):
@@ -82,3 +82,12 @@ def deleteProduct(pid):
     """
     sql = f"delete from `easy_cheese`.`products` where product_id = {pid};"
     return executeQueryAndCommit(sql)
+
+def removeInStoreQuantity(pid, new_qty_value):
+    sql = f"UPDATE `easy_cheese`.`products` SET in_store_qty = {new_qty_value} where product_id = {pid};"
+    return executeQueryAndCommit(sql)
+
+def getProductQtyByName(product_name):
+    sql = f"select product_id, in_store_qty from `easy_cheese`.`products` where name = '{product_name}';"
+    return executeQueryAndReturnResult(sql)
+
