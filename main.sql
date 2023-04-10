@@ -1,8 +1,8 @@
 DROP DATABASE IF EXISTS easy_cheese;
 
---*********************** 
---* CREATE THE DATABASE *
---***********************
+-- *********************** 
+-- * CREATE THE DATABASE *
+-- ***********************
 
 CREATE DATABASE easy_cheese;
 use easy_cheese;
@@ -24,7 +24,7 @@ CREATE TABLE products (
     product_desc    VARCHAR(100),
     vendor_id       INT             NOT NULL,
     in_store_qty    INT             NOT NULL,
-    price           DECIMAL(9,2)    NOT NULL,
+    price           DECIMAL(9,2)    NOT NULL
 );
 
 -- create the invoices table
