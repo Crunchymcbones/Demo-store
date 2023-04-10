@@ -75,7 +75,24 @@ where
 group by concat(c.last_name, ", ", c.first_name);
 end //
 delimiter ;
-   
+
+DELIMITER //
+DROP PROCEDURE if exists name_qty_price //
+CREATE procedure name_qty_price(invoice_id_param INT) 
+BEGIN
+SELECT 
+    p.name,
+    ili.qty,
+    SUM(p.price * ili.qty) AS Total
+FROM
+    invoice_line_items ili
+        JOIN
+    products p ON p.product_id = ili.product_id
+WHERE ili.invoice_id = invoice_id_param
+GROUP BY ili.product_id;
+END //
+DELIMITER ;
+
 -- *****************
 -- *  SAMPLE DATA  *
 -- *****************
