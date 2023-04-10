@@ -111,3 +111,13 @@ def getOutOfStock():
     sql = f"SELECT * FROM easy_cheese.products where in_store_qty = 0;"
     return executeQueryAndReturnResult(sql)
 
+def getCustomerIdAndName():
+    sql = f"SELECT customer_id, concat(first_name, ' ', last_name) from `easy_cheese`.`customers`"
+    return executeQueryAndReturnResult(sql)
+
+def getCustomerNameByID(cid):
+    sql = f"SELECT * from `easy_cheese`.`customers` where customer_id = {cid}"
+    custInfo = executeQueryAndReturnResult(sql)[1][0]
+    data = {'cust_id': custInfo[0], 'fname': custInfo[1], 'lname': custInfo[2], 'address': custInfo[3], 'email': custInfo[4], 'phone_number': custInfo[5]}
+    return data
+

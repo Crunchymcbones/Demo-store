@@ -19,7 +19,6 @@ class MainWindow(QMainWindow):
         self.initializeManager()
 
         self.initializeInvoicesTable()
-        self.initializeActiveCustomersTable()
 
     def initializeCheckoutWindow(self):
         self.coProdNameCbo = self.findChild(QComboBox, 'coProdNameCbo')
@@ -258,6 +257,9 @@ class MainWindow(QMainWindow):
     def checkInfoCurrentIndexChangedHandler(self):
         self.refreshCheckoutComboBox()
 
+    def customerInfoCurrentIndexChangedHandler(self):
+        self.refreshCustomerComboBox()
+
     def initializeAllProductsTable(self):
         self.invTbl = self.findChild(QTableWidget, 'invTbl')
         colNames, data = getAllProducts()
@@ -273,6 +275,7 @@ class MainWindow(QMainWindow):
         self.acBtn.clicked.connect(self.acBtnClickHandler)
         self.acLabel = self.findChild(QLabel, 'acLabel')
 
+        self.ecCboCustomer = self.findChild(QComboBox, 'ecCboCustomer')
         self.eccidLineEdit = self.findChild(QLineEdit, 'eccidLineEdit')
         self.ecfnameLineEdit = self.findChild(QLineEdit, 'ecfnameLineEdit')
         self.eclnameLineEdit = self.findChild(QLineEdit, 'eclnameLineEdit')
@@ -283,10 +286,15 @@ class MainWindow(QMainWindow):
         self.ecBtn.clicked.connect(self.ecBtnClickHandler)
         self.ecLabel = self.findChild(QLabel, 'ecLabel')
 
+        colNames, rows = getCustomerIdAndName()
+        print(colNames, rows)
+        for row in rows:
+            self.ecCboCustomer.addItem(row[1], userData=row[0])
+        self.invPnameCbo.currentIndexChanged.connect(self.customerInfoCurrentIndexChangedHandler)
+        self.refreshCustomerComboBox()
+
     def initializeManager(self):
         self.initializeInvoicesTable()
-        self.initializeActiveCustomersTable()
-        self.initializeOutOfStockTable()
 
     def acBtnClickHandler(self):
         try:
@@ -301,6 +309,7 @@ class MainWindow(QMainWindow):
         else:
             if result == 1:
                 self.acLabel.setText('Customer added')
+                self.refreshCustomersTab()
             else:
                 self.acLabel.setText('Customer not added')
 
@@ -331,27 +340,10 @@ class MainWindow(QMainWindow):
         self.acemailLineEdit.clear()
         self.acphoneLineEdit.clear()
 
-        self.eccidLineEdit.clear()
-        self.ecfnameLineEdit.clear()
-        self.eclnameLineEdit.clear()
-        self.ecaddressLineEdit.clear()
-        self.ecemailLineEdit.clear()
-        self.ecphoneLineEdit.clear()
-
     def initializeInvoicesTable(self):
         self.invoicesTableWidget = self.findChild(QTableWidget, 'invoicesTableWidget')
         colNames, data = getInvoices()
         self.displayInvoiceDataInTable(colNames, data, self.invoicesTableWidget)
-
-    def initializeActiveCustomersTable(self):
-        self.activeTableWidget = self.findChild(QTableWidget, 'activeTableWidget')
-        colNames, data = getActiveCustomers()
-        self.displayInvoiceDataInTable(colNames, data, self.activeTableWidget)
-
-    def initializeOutOfStockTable(self):
-        self.outOfStockTable = self.findChild(QTableWidget, 'outOfStockTable')
-        colNames, data = getOutOfStock()
-        self.displayStockDataInTable(colNames, data, self.outOfStockTable)
 
     def displayInvoiceDataInTable(self, columns, rows, table: QTableWidget):
         table.setRowCount(len(rows))
@@ -385,6 +377,21 @@ class MainWindow(QMainWindow):
         columns = ['Product_ID', 'Product_Name', 'Description', 'Vendor_ID', 'Quantity', 'Price']
         for i in range(table.columnCount()):
             table.setHorizontalHeaderItem(i, QTableWidgetItem(f'{columns[i]}'))
+
+    def refreshCustomerComboBox(self):
+        try:
+            cid = self.ecCboCustomer.currentData()
+            info = getCustomerNameByID(cid)
+            print("info", info)
+            self.eccidLineEdit.setText(str(info['cust_id']))
+            self.ecfnameLineEdit.setText(info['fname'])
+            self.eclnameLineEdit.setText(info['lname'])
+            self.ecaddressLineEdit.setText(info['address'])
+            self.ecemailLineEdit.setText(info['email'])
+            self.ecphoneLineEdit.setText(info['phone_number'])
+        except Exception as e:
+            print(e)
+
 
 
 if __name__ == '__main__':
