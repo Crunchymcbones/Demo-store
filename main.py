@@ -93,8 +93,10 @@ class MainWindow(QMainWindow):
         self.pdelBtn = self.findChild(QPushButton, 'pdelBtn')
         self.pdelBtn.clicked.connect(self.pdelBtnClickHandler)
 
-        # Table
+        # Random
         self.invTbl = self.findChild(QTableWidget, 'invTbl')
+        self.rdoOutOfStock = self.findChild(QRadioButton, 'rdoOutOfStock')
+        self.rdoOutOfStock.toggled.connect(self.initializeAllProductsTable)
 
         # Add Product
         self.apnameLineEdit = self.findChild(QLineEdit, 'apnameLineEdit')
@@ -113,8 +115,14 @@ class MainWindow(QMainWindow):
         self.refreshProductComboBox()
 
     def refreshProductTable(self):
-        colNames, data = getAllProducts()
-        self.displayDataInTable(colNames, data, self.invTbl)
+        if self.rdoOutOfStock.isChecked():
+            colNames, data = getAllProductsQtyZero()
+            self.displayDataInTable(colNames, data, self.invTbl)
+            print('on')
+        else:
+            colNames, data = getAllProducts()
+            self.displayDataInTable(colNames, data, self.invTbl)
+            print('off')
 
     def coDeleteBtnClickHandler(self):
         qtyPrice = []
@@ -261,8 +269,20 @@ class MainWindow(QMainWindow):
         self.refreshCustomerComboBox()
 
     def initializeAllProductsTable(self):
+        if self.rdoOutOfStock.isChecked():
+            self.invTbl = self.findChild(QTableWidget, 'invTbl')
+            colNames, data = getAllProductsQtyZero()
+            self.displayDataInTable(colNames, data, self.invTbl)
+            print('on')
+        else:
+            self.invTbl = self.findChild(QTableWidget, 'invTbl')
+            colNames, data = getAllProducts()
+            self.displayDataInTable(colNames, data, self.invTbl)
+            print('off')
+
+    def initializeOutOfStockProductsTable(self):
         self.invTbl = self.findChild(QTableWidget, 'invTbl')
-        colNames, data = getAllProducts()
+        colNames, data = getAllProductsWhereQtyZero()
         self.displayDataInTable(colNames, data, self.invTbl)
 
     def initializeCustomers(self):
@@ -356,27 +376,6 @@ class MainWindow(QMainWindow):
         for i in range(table.columnCount()):
             table.setHorizontalHeaderItem(i, QTableWidgetItem(f'{columns[i]}'))
 
-    def displayActiveCustomersInTable(self, columns, rows, table: QTableWidget):
-        table.setRowCount(len(rows))
-        table.setColumnCount(len(columns))
-        for i in range(len(rows)):
-            row = rows[i]
-            for j in range(len(row)):
-                table.setItem(i, j, QTableWidgetItem(str(row[j])))
-        columns = ['Customer_ID', 'Last_Purchase']
-        for i in range(table.columnCount()):
-            table.setHorizontalHeaderItem(i, QTableWidgetItem(f'{columns[i]}'))
-
-    def displayStockDataInTable(self, columns, rows, table: QTableWidget):
-        table.setRowCount(len(rows))
-        table.setColumnCount(len(columns))
-        for i in range(len(rows)):
-            row = rows[i]
-            for j in range(len(row)):
-                table.setItem(i, j, QTableWidgetItem(str(row[j])))
-        columns = ['Product_ID', 'Product_Name', 'Description', 'Vendor_ID', 'Quantity', 'Price']
-        for i in range(table.columnCount()):
-            table.setHorizontalHeaderItem(i, QTableWidgetItem(f'{columns[i]}'))
 
     def refreshCustomerComboBox(self):
         try:

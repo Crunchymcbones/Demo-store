@@ -27,6 +27,10 @@ def getAllProducts():
     sql = f"select * from `easy_cheese`.`products`;"
     return executeQueryAndReturnResult(sql)
 
+def getAllProductsQtyZero():
+    sql = f"select * from `easy_cheese`.`products` where in_store_qty = 0;"
+    return executeQueryAndReturnResult(sql)
+
 def getProductNameByID(pid):
     """
     Retrieves product information for the given product ID from the database.
@@ -37,7 +41,13 @@ def getProductNameByID(pid):
     Returns:
     dict: A dictionary containing the product ID, name, description, vendor ID, quantity, and price.
     """
-    sql = f"SELECT * from `easy_cheese`.`products` where product_id = {pid}"
+    sql = f"SELECT * from `easy_cheese`.`products` where product_id = {pid};"
+    prodInfo = executeQueryAndReturnResult(sql)[1][0]
+    data = {'prod_id': prodInfo[0], 'name': prodInfo[1], 'desc': prodInfo[2], 'vid': prodInfo[3], 'qty': prodInfo[4], 'price': prodInfo[5]}
+    return data
+
+def getAllProductsWhereQtyZero(pid):
+    sql = f"SELECT * from `easy_cheese`.`products` where product_id = {pid} and in_store_qty = 0;"
     prodInfo = executeQueryAndReturnResult(sql)[1][0]
     data = {'prod_id': prodInfo[0], 'name': prodInfo[1], 'desc': prodInfo[2], 'vid': prodInfo[3], 'qty': prodInfo[4], 'price': prodInfo[5]}
     return data
@@ -105,10 +115,6 @@ def getInvoices():
 
 def getActiveCustomers():
     sql = f"SELECT customer_id, date FROM easy_cheese.invoices where date >= date_sub(now(), Interval 1 month);"
-    return executeQueryAndReturnResult(sql)
-
-def getOutOfStock():
-    sql = f"SELECT * FROM easy_cheese.products where in_store_qty = 0;"
     return executeQueryAndReturnResult(sql)
 
 def getCustomerIdAndName():
