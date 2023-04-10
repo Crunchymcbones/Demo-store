@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -309,7 +309,7 @@
          <x>10</x>
          <y>20</y>
          <width>71</width>
-         <height>16</height>
+         <height>20</height>
         </rect>
        </property>
        <property name="text">
@@ -531,6 +531,19 @@
       </property>
       <property name="text">
        <string/>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="rdoOutOfStock">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>530</y>
+        <width>91</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Out of stock</string>
       </property>
      </widget>
     </widget>
