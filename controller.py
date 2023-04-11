@@ -113,8 +113,8 @@ def getInvoices():
     sql = f"select * from `easy_cheese`.`invoices`;"
     return executeQueryAndReturnResult(sql)
 
-def getActiveCustomers():
-    sql = f"SELECT customer_id, date FROM easy_cheese.invoices where date >= date_sub(now(), Interval 1 month);"
+def getActiveCustomers(months):
+    sql = f"SELECT c.customer_id,CONCAT(c.first_name, ' ', c.last_name) AS name, c.address, c.email_address, c.phone_number, i.date FROM easy_cheese.customers c JOIN easy_cheese.invoices i on c.customer_id = i.customer_id WHERE date >= DATE_SUB(NOW(), INTERVAL {months} MONTH);"
     return executeQueryAndReturnResult(sql)
 
 def getCustomerIdAndName():

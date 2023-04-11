@@ -48,8 +48,6 @@ class MainWindow(QMainWindow):
         pID = self.coProdNameCbo.currentData()
         info = getProductNameByID(pID)
         qty = self.coQtyBO.value()
-        overall_total = 0
-        qtyPrice = []
 
         matching_items = self.coTbl.findItems(info['name'], Qt.MatchFlag.MatchContains)
         if matching_items:
@@ -70,13 +68,21 @@ class MainWindow(QMainWindow):
             self.coTbl.setItem(rowPosition, 0, QTableWidgetItem(info['name']))
             self.coTbl.setItem(rowPosition, 1, QTableWidgetItem(str(qty)))
             self.coTbl.setItem(rowPosition, 2, QTableWidgetItem(str(product_total)))
-            for i in range(rowPosition):
-                qtyPrice.append([self.coTbl.item(i, 0).text(), self.coTbl.item(i, 2).text()])
 
-            for i in qtyPrice:
-                overall_total += float(i[1])
+        self.get_total()
 
-            self.lblCoTotal.setText(str(round(overall_total, 2)))
+    def get_total(self):
+        rowPosition = self.coTbl.rowCount()
+        overall_total = 0
+        qtyPrice = []
+
+        for i in range(rowPosition):
+            qtyPrice.append([self.coTbl.item(i, 0).text(), self.coTbl.item(i, 2).text()])
+
+        for i in qtyPrice:
+            overall_total += float(i[1])
+
+        self.lblCoTotal.setText(str(round(overall_total, 2)))
     def initializeInventory(self):
         # Edit Product
         self.invPnameCbo = self.findChild(QComboBox, 'invPnameCbo')
@@ -97,6 +103,8 @@ class MainWindow(QMainWindow):
         self.invTbl = self.findChild(QTableWidget, 'invTbl')
         self.rdoOutOfStock = self.findChild(QRadioButton, 'rdoOutOfStock')
         self.rdoOutOfStock.toggled.connect(self.initializeAllProductsTable)
+        self.activeCustomersCbo = self.findChild(QComboBox, 'activeCustomersCbo')
+        self.activeCustomersCbo.currentIndexChanged.connect(self.initializeActiveCustomerTable)
 
         # Add Product
         self.apnameLineEdit = self.findChild(QLineEdit, 'apnameLineEdit')
@@ -255,6 +263,9 @@ class MainWindow(QMainWindow):
         try:
             pID = self.coProdNameCbo.currentData()
             info = getProductNameByID(pID)
+            self.coQtyBO.setValue(0)
+            self.coQtyBO.setMinimum(1)
+            self.coQtyBO.setMaximum(info['qty'])
             print("info", info)
         except Exception as e:
             print(e)
@@ -279,6 +290,23 @@ class MainWindow(QMainWindow):
             colNames, data = getAllProducts()
             self.displayDataInTable(colNames, data, self.invTbl)
             print('off')
+
+    def initializeActiveCustomerTable(self):
+        try:
+            if self.activeCustomersCbo.currentText() == '3 Months':
+                self.activeTableWidget_2 = self.findChild(QTableWidget, 'activeTableWidget_2')
+                colNames, data = getActiveCustomers(3)
+                self.displayActiveCustomersInTable(colNames, data, self.invTbl)
+            elif self.activeCustomersCbo.currentText() == '6 Months':
+                self.activeTableWidget_2 = self.findChild(QTableWidget, 'activeTableWidget_2')
+                colNames, data = getActiveCustomers(6)
+                self.displayActiveCustomersInTable(colNames, data, self.invTbl)
+            elif self.activeCustomersCbo.currentText() == '9 Months':
+                self.activeTableWidget_2 = self.findChild(QTableWidget, 'activeTableWidget_2')
+                colNames, data = getActiveCustomers(9)
+                self.displayActiveCustomersInTable(colNames, data, self.invTbl)
+        except IndexError as ie:
+            print(f'there are no active customers {self.activeCustomersCbo.currentText()} ago.')
 
     def initializeOutOfStockProductsTable(self):
         self.invTbl = self.findChild(QTableWidget, 'invTbl')
@@ -376,6 +404,16 @@ class MainWindow(QMainWindow):
         for i in range(table.columnCount()):
             table.setHorizontalHeaderItem(i, QTableWidgetItem(f'{columns[i]}'))
 
+    def displayActiveCustomersInTable(self, columns, rows, table: QTableWidget):
+        table.setRowCount(len(rows))
+        table.setColumnCount(len(columns))
+        for i in range(len(rows)):
+            row = rows[i]
+            for j in range(len(row)):
+                table.setItem(i, j, QTableWidgetItem(str(row[j])))
+        columns = ['customer_id', 'name', 'address', 'email', 'phone_number, date']
+        for i in range(table.columnCount()):
+            table.setHorizontalHeaderItem(i, QTableWidgetItem(f'{columns[i]}'))
 
     def refreshCustomerComboBox(self):
         try:
