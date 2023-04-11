@@ -1,8 +1,8 @@
 DROP DATABASE IF EXISTS easy_cheese;
 
---*********************** 
---* CREATE THE DATABASE *
---***********************
+-- *********************** 
+-- * CREATE THE DATABASE *
+-- ***********************
 
 CREATE DATABASE easy_cheese;
 use easy_cheese;
@@ -24,7 +24,7 @@ CREATE TABLE products (
     product_desc    VARCHAR(100),
     vendor_id       INT             NOT NULL,
     in_store_qty    INT             NOT NULL,
-    price           DECIMAL(9,2)    NOT NULL,
+    price           DECIMAL(9,2)    NOT NULL
 );
 
 -- create the invoices table
@@ -75,7 +75,24 @@ where
 group by concat(c.last_name, ", ", c.first_name);
 end //
 delimiter ;
-   
+
+DELIMITER //
+DROP PROCEDURE if exists name_qty_price //
+CREATE procedure name_qty_price(invoice_id_param INT) 
+BEGIN
+SELECT 
+    p.name,
+    ili.qty,
+    SUM(p.price * ili.qty) AS Total
+FROM
+    invoice_line_items ili
+        JOIN
+    products p ON p.product_id = ili.product_id
+WHERE ili.invoice_id = invoice_id_param
+GROUP BY ili.product_id;
+END //
+DELIMITER ;
+
 -- *****************
 -- *  SAMPLE DATA  *
 -- *****************
