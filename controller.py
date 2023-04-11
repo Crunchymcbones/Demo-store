@@ -118,12 +118,19 @@ def getActiveCustomers(months):
     return executeQueryAndReturnResult(sql)
 
 def getCustomerIdAndName():
-    sql = f"SELECT customer_id, concat(first_name, ' ', last_name) from `easy_cheese`.`customers`"
+    sql = f"SELECT customer_id, concat(first_name, ' ', last_name) from `easy_cheese`.`customers`;"
     return executeQueryAndReturnResult(sql)
 
 def getCustomerNameByID(cid):
-    sql = f"SELECT * from `easy_cheese`.`customers` where customer_id = {cid}"
+    sql = f"SELECT * from `easy_cheese`.`customers` where customer_id = {cid};"
     custInfo = executeQueryAndReturnResult(sql)[1][0]
     data = {'cust_id': custInfo[0], 'fname': custInfo[1], 'lname': custInfo[2], 'address': custInfo[3], 'email': custInfo[4], 'phone_number': custInfo[5]}
+    return data
+
+def getInvoiceLineItems(iid):
+    sql = f"call easy_cheese.name_qty_price({iid});"
+    invoiceinfo = executeQueryAndReturnResult(sql)[1][0]
+    data = {'name': invoiceinfo[0], 'qty': invoiceinfo[1], 'price': invoiceinfo[2]}
+    print(data)
     return data
 

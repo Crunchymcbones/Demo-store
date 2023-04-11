@@ -56,9 +56,17 @@ class MainWindow(QMainWindow):
                 if info['name'] == item:
                     product_quantity = int(self.coTbl.item(row, 1).text())
                     new_product_quantity = product_quantity + qty
-                    self.coTbl.setItem(row, 1, QTableWidgetItem(str(new_product_quantity)))
-                    product_total = new_product_quantity * info['price']
-                    self.coTbl.setItem(row, 2, QTableWidgetItem(str(product_total)))
+                    if new_product_quantity >= info['qty']:
+                        msg = QMessageBox(self)
+                        msg.setWindowTitle("Error")
+                        msg.setText(f"You cannot purchase this much of {item}... Please try again.")
+                        msg.setStandardButtons(QMessageBox.StandardButton.Ok)
+                        msg.setIcon(QMessageBox.Icon.Question)
+                        button = msg.exec()
+                    else:
+                        self.coTbl.setItem(row, 1, QTableWidgetItem(str(new_product_quantity)))
+                        product_total = new_product_quantity * info['price']
+                        self.coTbl.setItem(row, 2, QTableWidgetItem(str(product_total)))
         else:
             self.coTbl.insertRow(rowPosition)
             self.coTbl.setColumnCount(3)
@@ -182,6 +190,7 @@ class MainWindow(QMainWindow):
         if result == 1:
             self.refreshProductTable()
             self.refreshProductComboBox()
+            self.refreshCheckoutComboBox()
             self.lblEditDeleteProd.setText('Product edited successfully!')
         else:
             self.lblEditDeleteProd.setText('Product could not be edited... Please try again.')
@@ -201,6 +210,7 @@ class MainWindow(QMainWindow):
                 result = deleteProduct(pid)
                 if result == 1:
                     self.lblEditDeleteProd.setText('Product deleted successfully!')
+                    self.refreshCheckoutComboBox()
                     self.refreshProductTable()
                     self.refreshProductComboBox()
                 else:
@@ -313,6 +323,11 @@ class MainWindow(QMainWindow):
         colNames, data = getAllProductsWhereQtyZero()
         self.displayDataInTable(colNames, data, self.invTbl)
 
+    def initializeLineItemsTable(self, iid):
+        self.invoicesTableWidget_2 = self.findChild(QTableWidget, 'invoicesTableWidget_2')
+        colNames, data = getInvoiceLineItems(iid)
+        self.displayLineItemsInTable(colNames, data, self.invTbl)
+
     def initializeCustomers(self):
         self.acfnameLineEdit = self.findChild(QLineEdit, 'acfnameLineEdit')
         self.aclnameLineEdit = self.findChild(QLineEdit, 'aclnameLineEdit')
@@ -389,9 +404,19 @@ class MainWindow(QMainWindow):
         self.acphoneLineEdit.clear()
 
     def initializeInvoicesTable(self):
+        self.invoicesTableWidget_2 = self.findChild(QTableWidget, 'invoicesTableWidget_2')
         self.invoicesTableWidget = self.findChild(QTableWidget, 'invoicesTableWidget')
+        self.getLineItemsBtn = self.findChild(QPushButton, 'getLineItemsBtn')
+        self.getLineItemsBtn.clicked.connect(self.invoiceLineItemsClickedHandler)
+
         colNames, data = getInvoices()
         self.displayInvoiceDataInTable(colNames, data, self.invoicesTableWidget)
+
+    def invoiceLineItemsClickedHandler(self):
+        row = self.invoicesTableWidget.currentRow()
+        item = self.invoicesTableWidget.item(row, 0).text()
+        print(item)
+        self.initializeLineItemsTable(item)
 
     def displayInvoiceDataInTable(self, columns, rows, table: QTableWidget):
         table.setRowCount(len(rows))
@@ -412,6 +437,17 @@ class MainWindow(QMainWindow):
             for j in range(len(row)):
                 table.setItem(i, j, QTableWidgetItem(str(row[j])))
         columns = ['customer_id', 'name', 'address', 'email', 'phone_number, date']
+        for i in range(table.columnCount()):
+            table.setHorizontalHeaderItem(i, QTableWidgetItem(f'{columns[i]}'))
+
+    def displayLineItemsInTable(self, columns, rows, table: QTableWidget):
+        table.setRowCount(len(rows))
+        table.setColumnCount(len(columns))
+        for i in range(len(rows)):
+            row = rows[i]
+            for j in range(len(row)):
+                table.setItem(i, j, QTableWidgetItem(str(row[j])))
+        columns = ['name', 'qty', 'total']
         for i in range(table.columnCount()):
             table.setHorizontalHeaderItem(i, QTableWidgetItem(f'{columns[i]}'))
 
