@@ -31,6 +31,15 @@ class MainWindow(QMainWindow):
         self.coCOnfirmBtn = self.findChild(QPushButton, 'coCOnfirmBtn')
         self.coCOnfirmBtn.clicked.connect(self.coCOnfirmClickHandler)
         self.coTbl = self.findChild(QTableWidget, 'coTbl')
+
+        self.ecCboCustomer_2 = self.findChild(QComboBox, 'ecCboCustomer_2')
+        self.eccidLineEdit_2 = self.findChild(QLineEdit, 'eccidLineEdit_2')
+        self.ecfnameLineEdit_2 = self.findChild(QLineEdit, 'ecfnameLineEdit_2')
+        self.eclnameLineEdit_2 = self.findChild(QLineEdit, 'eclnameLineEdit_2')
+        self.ecaddressLineEdit_2 = self.findChild(QLineEdit, 'ecaddressLineEdit_2')
+        self.ecemailLineEdit_2 = self.findChild(QLineEdit, 'ecemailLineEdit_2')
+        self.ecphoneLineEdit_2 = self.findChild(QLineEdit, 'ecphoneLineEdit_2')
+
         self.coTbl.setColumnCount(3)
         self.coTbl.setHorizontalHeaderItem(0, QTableWidgetItem(f'Product Name'))
         self.coTbl.setHorizontalHeaderItem(1, QTableWidgetItem(f'Product Quantity'))
@@ -42,6 +51,13 @@ class MainWindow(QMainWindow):
             self.coProdNameCbo.addItem(row[1], userData=row[0])
         self.coProdNameCbo.currentIndexChanged.connect(self.checkInfoCurrentIndexChangedHandler)
         self.refreshCheckoutComboBox()
+
+        colNames1, rows1 = getCustomerIdAndName()
+        print(colNames1, rows1)
+        for row in rows1:
+            self.ecCboCustomer_2.addItem(row[1], userData=row[0])
+        self.ecCboCustomer_2.currentIndexChanged.connect(self.customerInfoCurrentIndexChangedHandler)
+        self.refreshCustomerComboBox()
 
     def addToTableBtnClickedHandler(self):
         rowPosition = self.coTbl.rowCount()
@@ -474,8 +490,18 @@ class MainWindow(QMainWindow):
             self.ecaddressLineEdit.setText(info['address'])
             self.ecemailLineEdit.setText(info['email'])
             self.ecphoneLineEdit.setText(info['phone_number'])
+
+            cid1 = self.ecCboCustomer_2.currentData()
+            info1 = getCustomerNameByID(cid1)
+            self.eccidLineEdit_2.setText(str(info1['cust_id']))
+            self.ecfnameLineEdit_2.setText(info1['fname'])
+            self.eclnameLineEdit_2.setText(info1['lname'])
+            self.ecaddressLineEdit_2.setText(info1['address'])
+            self.ecemailLineEdit_2.setText(info1['email'])
+            self.ecphoneLineEdit_2.setText(info1['phone_number'])
         except Exception as e:
             print(e)
+
 
 
 
