@@ -117,6 +117,10 @@ def getActiveCustomers(months):
     sql = f"SELECT c.customer_id,CONCAT(c.first_name, ' ', c.last_name) AS name, c.address, c.email_address, c.phone_number, i.date FROM easy_cheese.customers c JOIN easy_cheese.invoices i on c.customer_id = i.customer_id WHERE date >= DATE_SUB(NOW(), INTERVAL {months} MONTH);"
     return executeQueryAndReturnResult(sql)
 
+def getAllCustomers():
+    sql = f"SELECT c.customer_id,CONCAT(c.first_name, ' ', c.last_name) AS name, c.address, c.email_address, c.phone_number, i.date FROM easy_cheese.customers c JOIN easy_cheese.invoices i on c.customer_id = i.customer_id;"
+    return executeQueryAndReturnResult(sql)
+
 def getCustomerIdAndName():
     sql = f"SELECT customer_id, concat(first_name, ' ', last_name) from `easy_cheese`.`customers`;"
     return executeQueryAndReturnResult(sql)
@@ -129,8 +133,4 @@ def getCustomerNameByID(cid):
 
 def getInvoiceLineItems(iid):
     sql = f"call easy_cheese.name_qty_price({iid});"
-    invoiceinfo = executeQueryAndReturnResult(sql)[1][0]
-    data = {'name': invoiceinfo[0], 'qty': invoiceinfo[1], 'price': invoiceinfo[2]}
-    print(data)
-    return data
-
+    return executeQueryAndReturnResult(sql)[1]
