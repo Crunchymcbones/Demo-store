@@ -93,9 +93,12 @@ def deleteProduct(pid):
     sql = f"delete from `easy_cheese`.`products` where product_id = {pid};"
     return executeQueryAndCommit(sql)
 
-def removeInStoreQuantity(pid, new_qty_value):
-    sql = f"UPDATE `easy_cheese`.`products` SET in_store_qty = {new_qty_value} where product_id = {pid};"
-    return executeQueryAndCommit(sql)
+def removeInStoreQuantity(dict):
+    for i in dict:
+        for key, value in i.items():
+            sql = f"UPDATE `easy_cheese`.`products` SET in_store_qty = {value} where product_id = {key};"
+            executeQueryAndCommit(sql)
+    return True
 
 def getProductQtyByName(product_name):
     sql = f"select product_id, in_store_qty from `easy_cheese`.`products` where name = '{product_name}';"
@@ -134,3 +137,15 @@ def getCustomerNameByID(cid):
 def getInvoiceLineItems(iid):
     sql = f"call easy_cheese.name_qty_price({iid});"
     return executeQueryAndReturnResult(sql)[1]
+
+def createInvoice(cid):
+    sql = f"insert into `easy_cheese`.`invoices`(customer_id, date) VALUES({cid}, NOW());"
+    return executeQueryAndCommit(sql)
+
+def getInvoiceId():
+    sql = f"select invoice_id from `easy_cheese`.`invoices` order by invoice_id desc limit 1;"
+    return executeQueryAndReturnResult(sql)
+
+def insertIntoLineItems(invoice_id, product_id, qty):
+    sql = f"insert into `easy_cheese`.`invoice_line_items`(invoice_id, product_id, qty) VALUES({invoice_id}, {product_id}, {qty});"
+    return executeQueryAndCommit(sql)

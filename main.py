@@ -172,24 +172,37 @@ class MainWindow(QMainWindow):
     def coCOnfirmClickHandler(self):
         rowPosition = self.coTbl.rowCount()
         information = []
+        cid = self.eccidLineEdit_2.text()
+        self.createInvoiceAndLineItems(int(cid))
 
         for row in range(rowPosition):
             name = self.coTbl.item(row, 0).text()
             qty = self.coTbl.item(row, 1).text()
-            information.append({name: qty})
             in_store_qty = getProductQtyByName(name)[1][0][1]
             pid = getProductQtyByName(name)[1][0][0]
             updated_qty = int(in_store_qty) - int(qty)
-            result = removeInStoreQuantity(pid, updated_qty)
-            if result == 1:
-                self.refreshProductTable()
-                self.refreshProductComboBox()
-                self.coTbl.clear()
-                self.coTbl.setRowCount(0)
-                self.coTbl.setColumnCount(3)
-                self.coTbl.setHorizontalHeaderItem(0, QTableWidgetItem(f'Product Name'))
-                self.coTbl.setHorizontalHeaderItem(1, QTableWidgetItem(f'Product Quantity'))
-                self.coTbl.setHorizontalHeaderItem(2, QTableWidgetItem(f'Product Price'))
+            information.append({pid: updated_qty})
+        result = removeInStoreQuantity(information)
+        if result == 1:
+            for row in range(rowPosition):
+                name = self.coTbl.item(row, 0).text()
+                qty = self.coTbl.item(row, 1).text()
+                invoice_id = getInvoiceId()[1][0][0]
+                product_id = getProductQtyByName(name)[1][0][0]
+                insertIntoLineItems(int(invoice_id), int(product_id), int(qty))
+            self.refreshProductTable()
+            self.refreshProductComboBox()
+            self.coTbl.clear()
+            self.coTbl.setRowCount(0)
+            self.coTbl.setColumnCount(3)
+            self.coTbl.setHorizontalHeaderItem(0, QTableWidgetItem(f'Product Name'))
+            self.coTbl.setHorizontalHeaderItem(1, QTableWidgetItem(f'Product Quantity'))
+            self.coTbl.setHorizontalHeaderItem(2, QTableWidgetItem(f'Product Price'))
+            self.lblCoTotal.setText(str((0)))
+            self.refreshInvoiceTable()
+
+    def createInvoiceAndLineItems(self, cid):
+        createInvoice(cid)
 
     def peditBtnClickHandler(self):
         pid = self.pidLineEdit.text()
@@ -434,6 +447,10 @@ class MainWindow(QMainWindow):
         self.getLineItemsBtn = self.findChild(QPushButton, 'getLineItemsBtn')
         self.getLineItemsBtn.clicked.connect(self.invoiceLineItemsClickedHandler)
 
+        colNames, data = getInvoices()
+        self.displayInvoiceDataInTable(colNames, data, self.invoicesTableWidget)
+
+    def refreshInvoiceTable(self):
         colNames, data = getInvoices()
         self.displayInvoiceDataInTable(colNames, data, self.invoicesTableWidget)
 
