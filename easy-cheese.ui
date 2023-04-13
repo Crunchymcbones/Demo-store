@@ -15,6 +15,9 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTabWidget" name="tabWidget">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -26,6 +29,103 @@
     <property name="currentIndex">
      <number>0</number>
     </property>
+    <widget class="QWidget" name="tab_6">
+     <attribute name="title">
+      <string>Login</string>
+     </attribute>
+     <widget class="QLabel" name="label_34">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>20</y>
+        <width>541</width>
+        <height>81</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>32</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Easy Cheese Store Login</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_35">
+      <property name="geometry">
+       <rect>
+        <x>410</x>
+        <y>120</y>
+        <width>71</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Cashier ID:</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="cashPass">
+      <property name="geometry">
+       <rect>
+        <x>490</x>
+        <y>150</y>
+        <width>113</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="cashLoginFeedback">
+      <property name="geometry">
+       <rect>
+        <x>376</x>
+        <y>210</y>
+        <width>231</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="cashLoginBtn">
+      <property name="geometry">
+       <rect>
+        <x>510</x>
+        <y>180</y>
+        <width>75</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Login</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="cashId">
+      <property name="geometry">
+       <rect>
+        <x>490</x>
+        <y>120</y>
+        <width>113</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_36">
+      <property name="geometry">
+       <rect>
+        <x>380</x>
+        <y>150</y>
+        <width>111</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Cashier Password:</string>
+      </property>
+     </widget>
+    </widget>
     <widget class="QWidget" name="tab">
      <attribute name="title">
       <string>Checkout</string>
@@ -741,8 +841,8 @@
      <widget class="QRadioButton" name="rdoOutOfStock">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>530</y>
+        <x>370</x>
+        <y>20</y>
         <width>91</width>
         <height>21</height>
        </rect>
@@ -899,9 +999,9 @@
       <widget class="QLabel" name="acLabel">
        <property name="geometry">
         <rect>
-         <x>50</x>
+         <x>20</x>
          <y>230</y>
-         <width>211</width>
+         <width>351</width>
          <height>20</height>
         </rect>
        </property>
@@ -1079,9 +1179,9 @@
       <widget class="QLabel" name="ecLabel">
        <property name="geometry">
         <rect>
-         <x>100</x>
+         <x>20</x>
          <y>300</y>
-         <width>181</width>
+         <width>341</width>
          <height>31</height>
         </rect>
        </property>
@@ -1185,6 +1285,9 @@
       <string>Manager</string>
      </attribute>
      <widget class="QTabWidget" name="managerTabWidget">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -1201,6 +1304,9 @@
         <string>Invoices</string>
        </attribute>
        <widget class="QTableWidget" name="invoicesTableWidget">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -1213,7 +1319,7 @@
          <number>39</number>
         </attribute>
         <attribute name="horizontalHeaderDefaultSectionSize">
-         <number>139</number>
+         <number>100</number>
         </attribute>
         <attribute name="verticalHeaderVisible">
          <bool>false</bool>

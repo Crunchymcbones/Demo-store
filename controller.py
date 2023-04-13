@@ -46,11 +46,6 @@ def getProductNameByID(pid):
     data = {'prod_id': prodInfo[0], 'name': prodInfo[1], 'desc': prodInfo[2], 'vid': prodInfo[3], 'qty': prodInfo[4], 'price': prodInfo[5]}
     return data
 
-def getAllProductsWhereQtyZero(pid):
-    sql = f"SELECT * from `easy_cheese`.`products` where product_id = {pid} and in_store_qty = 0;"
-    prodInfo = executeQueryAndReturnResult(sql)[1][0]
-    data = {'prod_id': prodInfo[0], 'name': prodInfo[1], 'desc': prodInfo[2], 'vid': prodInfo[3], 'qty': prodInfo[4], 'price': prodInfo[5]}
-    return data
 
 def getProductIdsAndNames():
     """
@@ -61,6 +56,17 @@ def getProductIdsAndNames():
     """
     sql = f"select product_id, name from `easy_cheese`.`products`;"
     return executeQueryAndReturnResult(sql)
+
+def getLastProduct():
+    """
+    Retrieves the IDs and names of all products from the database.
+
+    Returns:
+    list: A list of tuples containing the product ID and name for each product in the database.
+    """
+    sql = f"select product_id, name from `easy_cheese`.`products` order by product_id desc limit 1;"
+    return executeQueryAndReturnResult(sql)
+
 
 def updateProduct(pid, name, desc, vid, qty, price):
     """
@@ -113,11 +119,11 @@ def editCustomer(cid, fname,lname, address, email, phone):
     return executeQueryAndCommit(sql)
 
 def getInvoices():
-    sql = f"select * from `easy_cheese`.`invoices`;"
+    sql = f"SELECT * FROM `easy_cheese`.`complete_invoice`;"
     return executeQueryAndReturnResult(sql)
 
 def getActiveCustomers(months):
-    sql = f"SELECT c.customer_id,CONCAT(c.first_name, ' ', c.last_name) AS name, c.address, c.email_address, c.phone_number, i.date FROM easy_cheese.customers c JOIN easy_cheese.invoices i on c.customer_id = i.customer_id WHERE date >= DATE_SUB(NOW(), INTERVAL {months} MONTH);"
+    sql = f"call `easy_cheese`.`active_customers`({months});"
     return executeQueryAndReturnResult(sql)
 
 def getAllCustomers():
@@ -126,6 +132,10 @@ def getAllCustomers():
 
 def getCustomerIdAndName():
     sql = f"SELECT customer_id, concat(first_name, ' ', last_name) from `easy_cheese`.`customers`;"
+    return executeQueryAndReturnResult(sql)
+
+def getLastCustomer():
+    sql = f"SELECT customer_id, concat(first_name, ' ', last_name) from `easy_cheese`.`customers` order by customer_id desc limit 1;;"
     return executeQueryAndReturnResult(sql)
 
 def getCustomerNameByID(cid):
@@ -149,3 +159,7 @@ def getInvoiceId():
 def insertIntoLineItems(invoice_id, product_id, qty):
     sql = f"insert into `easy_cheese`.`invoice_line_items`(invoice_id, product_id, qty) VALUES({invoice_id}, {product_id}, {qty});"
     return executeQueryAndCommit(sql)
+
+def getCashierInfo():
+    sql = f"select * from `easy_cheese`.`cashiers`;"
+    return executeQueryAndReturnResult(sql)
