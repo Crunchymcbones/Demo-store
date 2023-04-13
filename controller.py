@@ -27,6 +27,10 @@ def getAllProducts():
     sql = f"select * from `easy_cheese`.`products`;"
     return executeQueryAndReturnResult(sql)
 
+def getAllProductsQtyZero():
+    sql = f"select * from `easy_cheese`.`products` where in_store_qty = 0;"
+    return executeQueryAndReturnResult(sql)
+
 def getProductNameByID(pid):
     """
     Retrieves product information for the given product ID from the database.
@@ -37,7 +41,13 @@ def getProductNameByID(pid):
     Returns:
     dict: A dictionary containing the product ID, name, description, vendor ID, quantity, and price.
     """
-    sql = f"SELECT * from `easy_cheese`.`products` where product_id = {pid}"
+    sql = f"SELECT * from `easy_cheese`.`products` where product_id = {pid};"
+    prodInfo = executeQueryAndReturnResult(sql)[1][0]
+    data = {'prod_id': prodInfo[0], 'name': prodInfo[1], 'desc': prodInfo[2], 'vid': prodInfo[3], 'qty': prodInfo[4], 'price': prodInfo[5]}
+    return data
+
+def getAllProductsWhereQtyZero(pid):
+    sql = f"SELECT * from `easy_cheese`.`products` where product_id = {pid} and in_store_qty = 0;"
     prodInfo = executeQueryAndReturnResult(sql)[1][0]
     data = {'prod_id': prodInfo[0], 'name': prodInfo[1], 'desc': prodInfo[2], 'vid': prodInfo[3], 'qty': prodInfo[4], 'price': prodInfo[5]}
     return data
@@ -83,11 +93,59 @@ def deleteProduct(pid):
     sql = f"delete from `easy_cheese`.`products` where product_id = {pid};"
     return executeQueryAndCommit(sql)
 
-def removeInStoreQuantity(pid, new_qty_value):
-    sql = f"UPDATE `easy_cheese`.`products` SET in_store_qty = {new_qty_value} where product_id = {pid};"
-    return executeQueryAndCommit(sql)
+def removeInStoreQuantity(dict):
+    for i in dict:
+        for key, value in i.items():
+            sql = f"UPDATE `easy_cheese`.`products` SET in_store_qty = {value} where product_id = {key};"
+            executeQueryAndCommit(sql)
+    return True
 
 def getProductQtyByName(product_name):
     sql = f"select product_id, in_store_qty from `easy_cheese`.`products` where name = '{product_name}';"
     return executeQueryAndReturnResult(sql)
 
+def addCustomer(fname,lname, address, email, phone):
+    sql = f"INSERT INTO `easy_cheese`.`customers` (`first_name`, `last_name`, `address`, `email_address`, `phone_number`) VALUES ('{fname}', '{lname}', '{address}', '{email}', '{phone}');"
+    return executeQueryAndCommit(sql)
+
+def editCustomer(cid, fname,lname, address, email, phone):
+    sql = f"UPDATE `easy_cheese`.`customers` SET `first_name` = '{fname}', `last_name` = '{lname}', `address` = '{address}', `email_address` = '{email}', `phone_number` = '{phone}' WHERE (`customer_id` = '{cid}');"
+    return executeQueryAndCommit(sql)
+
+def getInvoices():
+    sql = f"select * from `easy_cheese`.`invoices`;"
+    return executeQueryAndReturnResult(sql)
+
+def getActiveCustomers(months):
+    sql = f"SELECT c.customer_id,CONCAT(c.first_name, ' ', c.last_name) AS name, c.address, c.email_address, c.phone_number, i.date FROM easy_cheese.customers c JOIN easy_cheese.invoices i on c.customer_id = i.customer_id WHERE date >= DATE_SUB(NOW(), INTERVAL {months} MONTH);"
+    return executeQueryAndReturnResult(sql)
+
+def getAllCustomers():
+    sql = f"SELECT c.customer_id,CONCAT(c.first_name, ' ', c.last_name) AS name, c.address, c.email_address, c.phone_number, i.date FROM easy_cheese.customers c JOIN easy_cheese.invoices i on c.customer_id = i.customer_id;"
+    return executeQueryAndReturnResult(sql)
+
+def getCustomerIdAndName():
+    sql = f"SELECT customer_id, concat(first_name, ' ', last_name) from `easy_cheese`.`customers`;"
+    return executeQueryAndReturnResult(sql)
+
+def getCustomerNameByID(cid):
+    sql = f"SELECT * from `easy_cheese`.`customers` where customer_id = {cid};"
+    custInfo = executeQueryAndReturnResult(sql)[1][0]
+    data = {'cust_id': custInfo[0], 'fname': custInfo[1], 'lname': custInfo[2], 'address': custInfo[3], 'email': custInfo[4], 'phone_number': custInfo[5]}
+    return data
+
+def getInvoiceLineItems(iid):
+    sql = f"call easy_cheese.name_qty_price({iid});"
+    return executeQueryAndReturnResult(sql)[1]
+
+def createInvoice(cid):
+    sql = f"insert into `easy_cheese`.`invoices`(customer_id, date) VALUES({cid}, NOW());"
+    return executeQueryAndCommit(sql)
+
+def getInvoiceId():
+    sql = f"select invoice_id from `easy_cheese`.`invoices` order by invoice_id desc limit 1;"
+    return executeQueryAndReturnResult(sql)
+
+def insertIntoLineItems(invoice_id, product_id, qty):
+    sql = f"insert into `easy_cheese`.`invoice_line_items`(invoice_id, product_id, qty) VALUES({invoice_id}, {product_id}, {qty});"
+    return executeQueryAndCommit(sql)
