@@ -540,8 +540,16 @@ class MainWindow(QMainWindow):
 
     def invoiceLineItemsClickedHandler(self):
         row = self.invoicesTableWidget.currentRow()
-        item = self.invoicesTableWidget.item(row, 0).text()
-        self.displayLineItemsInTable(item)
+        if row == -1:
+            msg = QMessageBox(self)
+            msg.setWindowTitle("Error")
+            msg.setText(f"Please select an invoice.")
+            msg.setStandardButtons(QMessageBox.StandardButton.Ok)
+            msg.setIcon(QMessageBox.Icon.Question)
+            button = msg.exec()
+        else:
+            item = self.invoicesTableWidget.item(row, 0).text()
+            self.displayLineItemsInTable(item)
 
     def displayInvoiceDataInTable(self, columns, rows, table: QTableWidget):
         table.setRowCount(len(rows))
