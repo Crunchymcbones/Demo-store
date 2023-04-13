@@ -43,13 +43,19 @@ CREATE TABLE invoice_line_items (
     CONSTRAINT invoice_product_pk PRIMARY KEY (invoice_id, product_id)
 );
 
+CREATE TABLE cashiers(
+    cashier_id      INT             PRIMARY KEY,
+    cashier_pass    VARCHAR(255)    NOT NULL,
+    is_manager      BOOLEAN         NOT NULL
+);
+
 -- create views -- 
 
 CREATE VIEW complete_invoice AS
 SELECT 
 	i.invoice_id, 
 	concat(c.first_name, " ", c.last_name) AS 'name', 
-	c.email_address, c.phone_number, sum(li.qty * p.price) AS 'item total', 
+	c.email_address, c.phone_number, i.date, sum(li.qty * p.price) AS 'item total',
 	round(sum(li.qty * p.price)*0.15, 2) AS 'invoice tax',
 	round(sum(li.qty * p.price)*1.15, 2) AS "invoice total", 
 	sum(li.qty) AS 'items purchased'
@@ -65,14 +71,17 @@ GROUP BY
 delimiter //
 create procedure active_customers (months int)
 begin
-select 
-	concat(c.last_name, ", ", c.first_name) as 'customer', 
-	date(max(i.date)) as 'last active'
+select
+       c.customer_id,
+       concat(c.last_name, ", ", c.first_name) AS name,
+       c.address,
+       c.email_address,
+       c.phone_number,
+       i.date
 from 
 	customers c join invoices i on c.customer_id = i.customer_id 
 where 
-	timestampdiff(month,i.date,date(now())) > 6
-group by concat(c.last_name, ", ", c.first_name);
+	i.date >= DATE_SUB(NOW(), INTERVAL months MONTH);
 end //
 delimiter ;
 
@@ -89,7 +98,7 @@ FROM
         JOIN
     products p ON p.product_id = ili.product_id
 WHERE ili.invoice_id = invoice_id_param
-GROUP BY ili.product_id;
+GROUP BY p.name, ili.qty;
 END //
 DELIMITER ;
 
@@ -196,3 +205,9 @@ VALUES
 	(18,14,13),
 	(19,17,12),
 	(20,4,7);
+
+-- sample data for cashiers
+INSERT INTO cashiers
+VALUES
+    (447, 'Paradise551', true),
+    (235, 'Paradise552', false);
