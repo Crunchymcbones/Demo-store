@@ -570,7 +570,7 @@ class MainWindow(QMainWindow):
                 self.ecLabel.setText('Customer updated')
                 self.ecCboCustomer_2.clear()
                 self.ecCboCustomer.clear()
-                colNames, rows = getLastCustomer()
+                colNames, rows = getCustomerIdAndName()
                 print(colNames, rows)
                 for row in rows:
                     self.ecCboCustomer_2.addItem(row[1], userData=row[0])
