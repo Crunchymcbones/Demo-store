@@ -27,9 +27,21 @@ def getAllProducts():
     sql = f"select * from `easy_cheese`.`products`;"
     return executeQueryAndReturnResult(sql)
 
+
 def getAllProductsQtyZero():
-    sql = f"select * from `easy_cheese`.`products` where in_store_qty = 0;"
+    """
+    Retrieves all products from the database with in-store quantity equal to zero.
+
+    Returns:
+        list: A list of dictionaries, where each dictionary contains the following product information:
+            - product_id (int): The ID of the product.
+            - name (str): The name of the product.
+            - in_store_qty (int): The in-store quantity of the product.
+            - price (float): The price of the product.
+    """
+    sql = f"SELECT * FROM `easy_cheese`.`products` WHERE in_store_qty = 0;"
     return executeQueryAndReturnResult(sql)
+
 
 def getProductNameByID(pid):
     """
@@ -56,6 +68,7 @@ def getProductIdsAndNames():
     """
     sql = f"select product_id, name from `easy_cheese`.`products`;"
     return executeQueryAndReturnResult(sql)
+
 
 def getLastProduct():
     """
@@ -86,6 +99,7 @@ def updateProduct(pid, name, desc, vid, qty, price):
     sql = f"UPDATE `easy_cheese`.`products` SET name = '{name}', product_desc = '{desc}', vendor_id = {vid}, in_store_qty = {qty}, price = {price} where product_id = {pid};"
     return executeQueryAndCommit(sql)
 
+
 def deleteProduct(pid):
     """
     Deletes the product with the given ID from the database.
@@ -99,72 +113,278 @@ def deleteProduct(pid):
     sql = f"delete from `easy_cheese`.`products` where product_id = {pid};"
     return executeQueryAndCommit(sql)
 
-def removeInStoreQuantity(dict):
-    for i in dict:
-        for key, value in i.items():
-            sql = f"UPDATE `easy_cheese`.`products` SET in_store_qty = {value} where product_id = {key};"
-            executeQueryAndCommit(sql)
+
+def removeInStoreQuantity(data):
+    """
+    Removes quantity from in-store quantity for products in the database.
+
+    Args:
+        data (list): A list of dictionaries, where each dictionary contains the following keys:
+            - product_id (int): The ID of the product.
+            - quantity (int): The quantity to be removed from the in-store quantity.
+
+    Returns:
+        bool: True if the update was successful, False otherwise.
+    """
+    def removeInStoreQuantity(dict):
+        for i in dict:
+            for key, value in i.items():
+                sql = f"UPDATE `easy_cheese`.`products` SET in_store_qty = {value} where product_id = {key};"
+                executeQueryAndCommit(sql)
     return True
 
+
 def getProductQtyByName(product_name):
-    sql = f"select product_id, in_store_qty from `easy_cheese`.`products` where name = '{product_name}';"
+    """
+    Retrieves product ID and in-store quantity for a given product name from the database.
+
+    Args:
+        product_name (str): The name of the product.
+
+    Returns:
+        list: A list of tuples, each containing the following product information:
+            - product_id (int): The ID of the product.
+            - in_store_qty (int): The in-store quantity of the product.
+    """
+    sql = f"SELECT product_id, in_store_qty FROM `easy_cheese`.`products` WHERE name = '{product_name}';"
     return executeQueryAndReturnResult(sql)
 
-def addCustomer(fname,lname, address, email, phone):
+
+def addCustomer(fname, lname, address, email, phone):
+    """
+    Adds a new customer to the database.
+
+    Args:
+        fname (str): The first name of the customer.
+        lname (str): The last name of the customer.
+        address (str): The address of the customer.
+        email (str): The email address of the customer.
+        phone (str): The phone number of the customer.
+
+    Returns:
+        bool: True if the customer was added successfully, False otherwise.
+    """
     sql = f"INSERT INTO `easy_cheese`.`customers` (`first_name`, `last_name`, `address`, `email_address`, `phone_number`) VALUES ('{fname}', '{lname}', '{address}', '{email}', '{phone}');"
     return executeQueryAndCommit(sql)
 
-def editCustomer(cid, fname,lname, address, email, phone):
+
+def editCustomer(cid, fname, lname, address, email, phone):
+    """
+    Edits an existing customer in the database.
+
+    Args:
+        cid (int): The customer ID.
+        fname (str): The first name of the customer.
+        lname (str): The last name of the customer.
+        address (str): The address of the customer.
+        email (str): The email address of the customer.
+        phone (str): The phone number of the customer.
+
+    Returns:
+        bool: True if the customer was edited successfully, False otherwise.
+    """
     sql = f"UPDATE `easy_cheese`.`customers` SET `first_name` = '{fname}', `last_name` = '{lname}', `address` = '{address}', `email_address` = '{email}', `phone_number` = '{phone}' WHERE (`customer_id` = '{cid}');"
     return executeQueryAndCommit(sql)
 
+
 def getInvoices():
+    """
+    Retrieves information about all invoices from the database.
+
+    Returns:
+        list: A list of tuples, each containing information about an invoice.
+    """
     sql = f"SELECT * FROM `easy_cheese`.`complete_invoice`;"
     return executeQueryAndReturnResult(sql)
 
+
 def getActiveCustomers(months):
-    sql = f"call `easy_cheese`.`active_customers`({months});"
+    """
+    Retrieves information about active customers based on the number of months since their last purchase.
+
+    Args:
+        months (int): The number of months since the last purchase.
+
+    Returns:
+        list: A list of tuples, each containing information about an active customer.
+    """
+    sql = f"CALL `easy_cheese`.`active_customers`({months});"
     return executeQueryAndReturnResult(sql)
+
 
 def getAllCustomers():
-    sql = f"SELECT c.customer_id,CONCAT(c.first_name, ' ', c.last_name) AS name, c.address, c.email_address, c.phone_number FROM easy_cheese.customers c group by c.customer_id, c.address, c.email_address, c.phone_number order by c.customer_id;"
+    """
+    Retrieves information about all customers from the database.
+
+    Returns:
+        list: A list of tuples, each containing the following customer information:
+            - customer_id (int): The customer ID.
+            - name (str): The name of the customer.
+            - address (str): The address of the customer.
+            - email_address (str): The email address of the customer.
+            - phone_number (str): The phone number of the customer.
+    """
+    sql = f"""
+        SELECT c.customer_id, CONCAT(c.first_name, ' ', c.last_name) AS name, c.address, c.email_address, c.phone_number
+        FROM easy_cheese.customers c
+        GROUP BY c.customer_id, c.address, c.email_address, c.phone_number
+	ORDER BY c.customer_id;
+    """
     return executeQueryAndReturnResult(sql)
+
 
 def getCustomerIdAndName():
-    sql = f"SELECT customer_id, concat(first_name, ' ', last_name) from `easy_cheese`.`customers`;"
+    """
+    Retrieves customer ID and name information for all customers from the database.
+
+    Returns:
+        list: A list of tuples, each containing the following customer information:
+            - customer_id (int): The customer ID.
+            - name (str): The name of the customer.
+    """
+    sql = f"SELECT customer_id, CONCAT(first_name, ' ', last_name) FROM `easy_cheese`.`customers`;"
     return executeQueryAndReturnResult(sql)
+
 
 def getLastCustomer():
-    sql = f"SELECT customer_id, concat(first_name, ' ', last_name) from `easy_cheese`.`customers` order by customer_id desc limit 1;;"
+    """
+    Retrieves information about the last customer from the database.
+
+    Returns:
+        tuple: A tuple containing the customer ID and the name of the customer.
+    """
+    sql = f"""
+        SELECT customer_id, CONCAT(first_name, ' ', last_name)
+        FROM `easy_cheese`.`customers`
+        ORDER BY customer_id DESC
+        LIMIT 1;
+    """
     return executeQueryAndReturnResult(sql)
 
+
 def getCustomerNameByID(cid):
-    sql = f"SELECT * from `easy_cheese`.`customers` where customer_id = {cid};"
+    """
+    Retrieves information about a customer by their customer ID.
+
+    Args:
+        cid (int): The customer ID.
+
+    Returns:
+        dict: A dictionary containing the following customer information:
+            - cust_id (int): The customer ID.
+            - fname (str): The first name of the customer.
+            - lname (str): The last name of the customer.
+            - address (str): The address of the customer.
+            - email (str): The email address of the customer.
+            - phone_number (str): The phone number of the customer.
+    """
+    sql = f"""
+        SELECT *
+        FROM `easy_cheese`.`customers`
+        WHERE customer_id = {cid};
+    """
     custInfo = executeQueryAndReturnResult(sql)[1][0]
-    data = {'cust_id': custInfo[0], 'fname': custInfo[1], 'lname': custInfo[2], 'address': custInfo[3], 'email': custInfo[4], 'phone_number': custInfo[5]}
+    data = {
+        'cust_id': custInfo[0],
+        'fname': custInfo[1],
+        'lname': custInfo[2],
+        'address': custInfo[3],
+        'email': custInfo[4],
+        'phone_number': custInfo[5]
+    }
     return data
 
+
 def getInvoiceLineItems(iid):
-    sql = f"call easy_cheese.name_qty_price({iid});"
+    """
+    Retrieves information about line items in an invoice by invoice ID.
+
+    Args:
+        iid (int): The invoice ID.
+
+    Returns:
+        list: A list of tuples, each containing the following information:
+            - product_id (int): The product ID of the line item.
+            - product_name (str): The name of the product.
+            - qty (int): The quantity of the product.
+            - price (float): The price of the product.
+    """
+    sql = f"CALL easy_cheese.name_qty_price({iid});"
     return executeQueryAndReturnResult(sql)[1]
 
+
 def createInvoice(cid):
-    sql = f"insert into `easy_cheese`.`invoices`(customer_id, date) VALUES({cid}, NOW());"
+    """
+    Creates a new invoice for a customer in the database.
+
+    Args:
+        cid (int): The customer ID for which the invoice is created.
+
+    Returns:
+        int: The invoice ID of the newly created invoice.
+    """
+    sql = f"INSERT INTO `easy_cheese`.`invoices` (customer_id, date) VALUES({cid}, NOW());"
     return executeQueryAndCommit(sql)
 
+
 def getInvoiceId():
+    """
+    Retrieves the invoice_id of the latest invoice from the 'invoices' table in the 'easy_cheese' database.
+
+    Returns:
+    - A tuple containing:
+        - column_names (list): A list of column names returned by the query.
+        - rows (list of tuples): A list of tuples, where each tuple represents a row returned by the query.
+    """
     sql = f"select invoice_id from `easy_cheese`.`invoices` order by invoice_id desc limit 1;"
     return executeQueryAndReturnResult(sql)
 
+
 def insertIntoLineItems(invoice_id, product_id, qty):
+    """
+    Inserts a new record into the 'invoice_line_items' table in the 'easy_cheese' database.
+
+    Args:
+    - invoice_id (int): The invoice ID to which the line item belongs.
+    - product_id (int): The product ID of the item.
+    - qty (int): The quantity of the item.
+
+    Returns:
+    - The number of rows affected by the query.
+    """
     sql = f"insert into `easy_cheese`.`invoice_line_items`(invoice_id, product_id, qty) VALUES({invoice_id}, {product_id}, {qty});"
     return executeQueryAndCommit(sql)
 
+
 def getCashierInfo():
+    """
+    Retrieves all records from the 'cashiers' table in the 'easy_cheese' database.
+
+    Returns:
+    - A tuple containing:
+        - column_names (list): A list of column names returned by the query.
+        - rows (list of tuples): A list of tuples, where each tuple represents a row returned by the query.
+    """
     sql = f"select * from `easy_cheese`.`cashiers`;"
     return executeQueryAndReturnResult(sql)
 
+
 def getLastInvoice():
+    """
+    Retrieves information about the last invoice from the database.
+
+    Returns:
+        tuple: A tuple containing the following information:
+            - invoice_id (int): The invoice ID.
+            - name (str): The name of the customer associated with the invoice.
+            - email_address (str): The email address of the customer.
+            - phone_number (str): The phone number of the customer.
+            - date (str): The date of the invoice.
+            - item total (float): The total cost of all items in the invoice.
+            - invoice tax (float): The tax amount applied to the invoice.
+            - invoice total (float): The total cost of the invoice including tax.
+            - items purchased (int): The total number of items purchased in the invoice.
+    """
     sql = f"    SELECT \
         `i`.`invoice_id` AS `invoice_id`, \
         CONCAT(`c`.`first_name`, ' ', `c`.`last_name`) AS `name`, \
@@ -184,7 +404,7 @@ def getLastInvoice():
         JOIN `easy_cheese`.`products` `p` ON ((`li`.`product_id` = `p`.`product_id`))) \
     GROUP BY `i`.`invoice_id`\
 	order by i.invoice_id desc limit 1;"
+ 
     csvInfo = executeQueryAndReturnResult(sql)[1][0]
     data = (csvInfo[0], csvInfo[1], csvInfo[2], csvInfo[3], csvInfo[5], csvInfo[6], csvInfo[7], csvInfo[8])
     return data
-
