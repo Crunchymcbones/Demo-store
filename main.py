@@ -21,7 +21,6 @@ class MainWindow(QMainWindow):
 
         self.initializeInvoicesTable()
 
-
     def intializeLogin(self):
         self.cashId = self.findChild(QLineEdit, 'cashId')
         self.cashPass = self.findChild(QLineEdit, 'cashPass')
@@ -75,7 +74,6 @@ class MainWindow(QMainWindow):
                             print('You are not a manager')
                     else:
                         self.cashLoginFeedback.setText('Incorrect username or password.')
-
 
     def initializeCheckoutWindow(self):
         self.coProdNameCbo = self.findChild(QComboBox, 'coProdNameCbo')
@@ -173,6 +171,7 @@ class MainWindow(QMainWindow):
             overall_total += float(i[1])
 
         self.lblCoTotal.setText(str(round(overall_total, 2)))
+
     def initializeInventory(self):
         # Edit Product
         self.invPnameCbo = self.findChild(QComboBox, 'invPnameCbo')
@@ -270,47 +269,46 @@ class MainWindow(QMainWindow):
         createInvoice(cid)
 
     def peditBtnClickHandler(self):
-            if self.pnameLineEdit.text() == '' or self.pdescLineEdit.text() == '' or self.ppriceLineEdit.text() == '' or self.pqtyLineEdit.text() == '' or self.vidLineEdit.text() == '':
-                msg = QMessageBox(self)
-                msg.setWindowTitle("Error")
-                msg.setText(f"Please enter the product information.")
-                msg.setStandardButtons(QMessageBox.StandardButton.Ok)
-                msg.setIcon(QMessageBox.Icon.Question)
-                button = msg.exec()
-            else:
-                try:
-                    pid = self.pidLineEdit.text()
-                    name = self.pnameLineEdit.text()
-                    assert name != "", 'Product name is mandatory... Please try again.'
-                    assert name != int or float, 'Product name has to be a string... Please try again.'
-                    desc = self.pdescLineEdit.text()
-                    assert desc != "", 'Product description is mandatory... Please try again.'
-                    assert desc != int or float, 'Product description has to be a string... Please try again.'
-                    price = self.ppriceLineEdit.text()
-                    assert price != str or int, 'Product price has to be a float... Please try again.'
-                    assert price != "", 'Product price is mandatory... Please try again.'
-                    pqty = self.pqtyLineEdit.text()
-                    assert pqty != str, 'Product quantity has to be an integer... Please try again.'
-                    assert pqty != "", 'Product quantity is mandatory... Please try again.'
-                    vid = self.vidLineEdit.text()
-                    assert vid != str, 'Vendor ID has to be an integer... Please try again.'
-                    assert vid != "", 'Vendor ID is mandatory... Please try again.'
+        if self.pnameLineEdit.text() == '' or self.pdescLineEdit.text() == '' or self.ppriceLineEdit.text() == '' or self.pqtyLineEdit.text() == '' or self.vidLineEdit.text() == '':
+            msg = QMessageBox(self)
+            msg.setWindowTitle("Error")
+            msg.setText(f"Please enter the product information.")
+            msg.setStandardButtons(QMessageBox.StandardButton.Ok)
+            msg.setIcon(QMessageBox.Icon.Question)
+            button = msg.exec()
+        else:
+            try:
+                pid = self.pidLineEdit.text()
+                name = self.pnameLineEdit.text()
+                assert name != "", 'Product name is mandatory... Please try again.'
+                assert name != int or float, 'Product name has to be a string... Please try again.'
+                desc = self.pdescLineEdit.text()
+                assert desc != "", 'Product description is mandatory... Please try again.'
+                assert desc != int or float, 'Product description has to be a string... Please try again.'
+                price = self.ppriceLineEdit.text()
+                assert price != str or int, 'Product price has to be a float... Please try again.'
+                assert price != "", 'Product price is mandatory... Please try again.'
+                pqty = self.pqtyLineEdit.text()
+                assert pqty != str, 'Product quantity has to be an integer... Please try again.'
+                assert pqty != "", 'Product quantity is mandatory... Please try again.'
+                vid = self.vidLineEdit.text()
+                assert vid != str, 'Vendor ID has to be an integer... Please try again.'
+                assert vid != "", 'Vendor ID is mandatory... Please try again.'
 
-                    result = updateProduct(pid, name, desc, vid, pqty, price)
-                    if result == 1:
-                        self.refreshProductTable()
-                        self.refreshProductComboBox()
-                        self.refreshCheckoutComboBox()
-                        self.lblEditDeleteProd.setText('Product edited successfully!')
-
-
-                    else:
-                        self.lblEditDeleteProd.setText('Product could not be edited... Please try again.')
+                result = updateProduct(pid, name, desc, vid, pqty, price)
+                if result == 1:
+                    self.refreshProductTable()
+                    self.refreshProductComboBox()
+                    self.refreshCheckoutComboBox()
+                    self.lblEditDeleteProd.setText('Product edited successfully!')
 
 
-                except AssertionError as ae:
-                    self.lblEditDeleteProd.setText(f"{ae}")
+                else:
+                    self.lblEditDeleteProd.setText('Product could not be edited... Please try again.')
 
+
+            except AssertionError as ae:
+                self.lblEditDeleteProd.setText(f"{ae}")
 
     def pdelBtnClickHandler(self):
         try:
@@ -382,18 +380,16 @@ class MainWindow(QMainWindow):
         except AssertionError as ae:
             self.lblAddProd.setText(f"{ae}")
 
-
-
     def displayDataInTable(self, columns, rows, table: QTableWidget):
-            table.setRowCount(len(rows))
-            table.setColumnCount(len(columns))
-            for i in range(len(rows)):
-                row = rows[i]
-                for j in range(len(row)):
-                    table.setItem(i, j, QTableWidgetItem(str(row[j])))
-            columns = ['pid', 'name', 'desc', 'vid', 'qty', 'price']
-            for i in range(table.columnCount()):
-                table.setHorizontalHeaderItem(i, QTableWidgetItem(f'{columns[i]}'))
+        table.setRowCount(len(rows))
+        table.setColumnCount(len(columns))
+        for i in range(len(rows)):
+            row = rows[i]
+            for j in range(len(row)):
+                table.setItem(i, j, QTableWidgetItem(str(row[j])))
+        columns = ['pid', 'name', 'desc', 'vid', 'qty', 'price']
+        for i in range(table.columnCount()):
+            table.setHorizontalHeaderItem(i, QTableWidgetItem(f'{columns[i]}'))
 
     def refreshProductComboBox(self):
         try:
@@ -474,7 +470,6 @@ class MainWindow(QMainWindow):
             # I have no idea why it is spitting this error out, but it still works
             pass
 
-
     def initializeCustomers(self):
         self.acfnameLineEdit = self.findChild(QLineEdit, 'acfnameLineEdit')
         self.aclnameLineEdit = self.findChild(QLineEdit, 'aclnameLineEdit')
@@ -510,17 +505,17 @@ class MainWindow(QMainWindow):
         try:
             fname = self.acfnameLineEdit.text()
             assert fname != "", 'First name is mandatory... Please try again.'
-            assert fname == str, 'First name has to be a string... Please try again.'
+            assert fname != int or float, 'First name has to be a string... Please try again.'
             lname = self.aclnameLineEdit.text()
             assert lname != "", 'Last name is mandatory... Please try again.'
-            assert lname == str, 'Last name has to be a string... Please try again.'
+            assert lname != int or float, 'Last name has to be a string... Please try again.'
             address = self.acaddressLineEdit.text()
             email = self.acemailLineEdit.text()
             assert email != "", 'Email is mandatory... Please try again.'
-            assert email == str, 'Email has to be a string... Please try again.'
+            assert email != int or float, 'Email has to be a string... Please try again.'
             phone = self.acphoneLineEdit.text()
             assert phone != "", 'Phone number is mandatory... Please try again.'
-            assert phone == str, 'Phone number has to be a string... Please try again.'
+            assert phone != int or float, 'Phone number has to be a string... Please try again.'
             result = addCustomer(fname, lname, address, email, phone)
             if result == 1:
                 self.acLabel.setText('Customer added')
@@ -539,19 +534,19 @@ class MainWindow(QMainWindow):
     def ecBtnClickHandler(self):
         try:
             cid = self.eccidLineEdit.text()
-            fname = self.acfnameLineEdit.text()
+            fname = self.ecfnameLineEdit.text()
             assert fname != "", 'First name is mandatory... Please try again.'
-            assert fname == str, 'First name has to be a string... Please try again.'
-            lname = self.aclnameLineEdit.text()
+            assert fname != int or float, 'First name has to be a string... Please try again.'
+            lname = self.eclnameLineEdit.text()
             assert lname != "", 'Last name is mandatory... Please try again.'
-            assert lname == str, 'Last name has to be a string... Please try again.'
-            address = self.acaddressLineEdit.text()
-            email = self.acemailLineEdit.text()
+            assert lname != int or float, 'Last name has to be a string... Please try again.'
+            address = self.ecaddressLineEdit.text()
+            email = self.ecemailLineEdit.text()
             assert email != "", 'Email is mandatory... Please try again.'
-            assert email == str, 'Email has to be a string... Please try again.'
-            phone = self.acphoneLineEdit.text()
+            assert email != int or float, 'Email has to be a string... Please try again.'
+            phone = self.ecphoneLineEdit.text()
             assert phone != "", 'Phone number is mandatory... Please try again.'
-            assert phone == str, 'Phone number has to be a string... Please try again.'
+            assert phone != int or float, 'Phone number has to be a string... Please try again.'
             result = editCustomer(cid, fname, lname, address, email, phone)
             if result == 1:
                 self.ecLabel.setText('Customer updated')
@@ -602,7 +597,8 @@ class MainWindow(QMainWindow):
             row = rows[i]
             for j in range(len(row)):
                 table.setItem(i, j, QTableWidgetItem(str(row[j])))
-        columns = ['Invoice_ID', 'Name', 'email', 'pnumber', 'date', 'item total', 'inv tax', 'inv total', 'qty purchased']
+        columns = ['Invoice_ID', 'Name', 'email', 'pnumber', 'date', 'item total', 'inv tax', 'inv total',
+                   'qty purchased']
         for i in range(table.columnCount()):
             table.setHorizontalHeaderItem(i, QTableWidgetItem(f'{columns[i]}'))
 
@@ -632,7 +628,6 @@ class MainWindow(QMainWindow):
             self.invoicesTableWidget_2.setItem(rowPosition, 1, QTableWidgetItem(str(info[i][1])))
             self.invoicesTableWidget_2.setItem(rowPosition, 2, QTableWidgetItem(str(info[i][2])))
 
-
     def refreshCustomerComboBox(self):
         try:
             cid = self.ecCboCustomer.currentData()
@@ -654,8 +649,6 @@ class MainWindow(QMainWindow):
             self.ecphoneLineEdit_2.setText(info1['phone_number'])
         except Exception as e:
             print(e)
-
-
 
 
 if __name__ == '__main__':
