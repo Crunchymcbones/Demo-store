@@ -3,7 +3,8 @@ import sys
 from PyQt6 import uic
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import *
-import winsound
+import csv
+import datetime
 
 from controller import *
 
@@ -53,9 +54,7 @@ class MainWindow(QMainWindow):
             colnames, rows = getCashierInfo()
             for row in rows:
                 if ID == row[0]:
-                    print(row[0])
                     if password == row[1]:
-                        print(password)
                         self.cashLoginFeedback.setText('Login successful')
                         if row[2] == 1:
                             self.tab.setEnabled(True)
@@ -64,14 +63,12 @@ class MainWindow(QMainWindow):
                             self.tab_4.setEnabled(True)
                             self.tab_5.setEnabled(True)
                             self.tab_6.setEnabled(False)
-                            print('You are a manager')
                         elif row[2] == 0:
                             self.tab.setEnabled(True)
                             self.tab_2.setEnabled(True)
                             self.tab_3.setEnabled(True)
                             self.tab_4.setEnabled(False)
                             self.tab_6.setEnabled(False)
-                            print('You are not a manager')
                     else:
                         self.cashLoginFeedback.setText('Incorrect username or password.')
 
@@ -94,6 +91,9 @@ class MainWindow(QMainWindow):
         self.ecaddressLineEdit_2 = self.findChild(QLineEdit, 'ecaddressLineEdit_2')
         self.ecemailLineEdit_2 = self.findChild(QLineEdit, 'ecemailLineEdit_2')
         self.ecphoneLineEdit_2 = self.findChild(QLineEdit, 'ecphoneLineEdit_2')
+
+        # Random
+        self.vsvFileRdo = self.findChild(QRadioButton, 'vsvFileRdo')
 
         self.coTbl.setColumnCount(3)
         self.coTbl.setHorizontalHeaderItem(0, QTableWidgetItem(f'Product Name'))
@@ -265,6 +265,11 @@ class MainWindow(QMainWindow):
             self.lblCoTotal.setText(str((0)))
             self.refreshInvoiceTable()
 
+            csvData = getLastInvoice()
+            print(csvData)
+
+            self.createNewInvoiceCSV(csvData)
+
     def createInvoiceAndLineItems(self, cid):
         createInvoice(cid)
 
@@ -301,6 +306,19 @@ class MainWindow(QMainWindow):
                     self.refreshProductComboBox()
                     self.refreshCheckoutComboBox()
                     self.lblEditDeleteProd.setText('Product edited successfully!')
+                    self.invPnameCbo.clear()
+                    self.coProdNameCbo.clear()
+                    colNames, rows = getProductIdsAndNames()
+                    for row in rows:
+                        self.invPnameCbo.addItem(row[1], userData=row[0])
+                    self.invPnameCbo.currentIndexChanged.connect(self.productInfoCurrentIndexChangedHandler)
+                    self.refreshProductComboBox()
+
+                    colNames1, rows1 = getProductIdsAndNames()
+                    for row in rows1:
+                        self.coProdNameCbo.addItem(row[1], userData=row[0])
+                    self.coProdNameCbo.currentIndexChanged.connect(self.checkInfoCurrentIndexChangedHandler)
+                    self.refreshCheckoutComboBox()
 
 
                 else:
@@ -318,7 +336,6 @@ class MainWindow(QMainWindow):
             msg.setText(f"Are you sure you want to delete {name}")
             msg.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
             msg.setIcon(QMessageBox.Icon.Question)
-            winsound.PlaySound("SystemExit", winsound.SND_ALIAS)
             button = msg.exec()
             if button == QMessageBox.StandardButton.Yes:
                 pid = self.pidLineEdit.text()
@@ -533,6 +550,7 @@ class MainWindow(QMainWindow):
 
     def ecBtnClickHandler(self):
         try:
+
             cid = self.eccidLineEdit.text()
             fname = self.ecfnameLineEdit.text()
             assert fname != "", 'First name is mandatory... Please try again.'
@@ -550,6 +568,13 @@ class MainWindow(QMainWindow):
             result = editCustomer(cid, fname, lname, address, email, phone)
             if result == 1:
                 self.ecLabel.setText('Customer updated')
+                self.ecCboCustomer_2.clear()
+                self.ecCboCustomer.clear()
+                colNames, rows = getLastCustomer()
+                print(colNames, rows)
+                for row in rows:
+                    self.ecCboCustomer_2.addItem(row[1], userData=row[0])
+                    self.ecCboCustomer.addItem(row[1], userData=row[0])
             else:
                 self.ecLabel.setText('Customer not updated')
         except AssertionError as ae:
@@ -649,6 +674,26 @@ class MainWindow(QMainWindow):
             self.ecphoneLineEdit_2.setText(info1['phone_number'])
         except Exception as e:
             print(e)
+
+    def createNewInvoiceCSV(self,data):
+        """Creates a new Invoice CSV file with a header row and single data row
+        Args:
+            row (tuple): Row of data to store in new CSV file
+        """
+        if self.vsvFileRdo.isChecked():
+            header = ['invoice_id', 'name', 'email_address', 'phone_number', 'item_total', 'invoice_tax', 'invoice_total',
+                      'items_purchased']
+            # Generates a unique file name with the date and time - Replace is used to avoid having files with : as some os will not enjoy
+            uniq_filename = str(datetime.datetime.now().date()) + '_' + str(datetime.datetime.now().time()).replace(':',
+                                                                                                                    '.') + ".csv"
+
+            # Opens and writes to a new CSV file
+            with open(uniq_filename, 'a', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow(header)
+                writer.writerow(data)
+        else:
+            pass
 
 
 if __name__ == '__main__':

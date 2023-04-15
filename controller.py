@@ -127,7 +127,7 @@ def getActiveCustomers(months):
     return executeQueryAndReturnResult(sql)
 
 def getAllCustomers():
-    sql = f"SELECT c.customer_id,CONCAT(c.first_name, ' ', c.last_name) AS name, c.address, c.email_address, c.phone_number, i.date FROM easy_cheese.customers c JOIN easy_cheese.invoices i on c.customer_id = i.customer_id;"
+    sql = f"SELECT c.customer_id,CONCAT(c.first_name, ' ', c.last_name) AS name, c.address, c.email_address, c.phone_number FROM easy_cheese.customers c group by c.customer_id, c.address, c.email_address, c.phone_number order by c.customer_id;"
     return executeQueryAndReturnResult(sql)
 
 def getCustomerIdAndName():
@@ -163,3 +163,28 @@ def insertIntoLineItems(invoice_id, product_id, qty):
 def getCashierInfo():
     sql = f"select * from `easy_cheese`.`cashiers`;"
     return executeQueryAndReturnResult(sql)
+
+def getLastInvoice():
+    sql = f"    SELECT \
+        `i`.`invoice_id` AS `invoice_id`, \
+        CONCAT(`c`.`first_name`, ' ', `c`.`last_name`) AS `name`, \
+        `c`.`email_address` AS `email_address`, \
+        `c`.`phone_number` AS `phone_number`, \
+        `i`.`date` AS `date`, \
+        SUM((`li`.`qty` * `p`.`price`)) AS `item total`, \
+        ROUND((SUM((`li`.`qty` * `p`.`price`)) * 0.15), \
+                2) AS `invoice tax`, \
+        ROUND((SUM((`li`.`qty` * `p`.`price`)) * 1.15), \
+                2) AS `invoice total`, \
+        SUM(`li`.`qty`) AS `items purchased` \
+    FROM \
+        (((`easy_cheese`.`invoices` `i` \
+        JOIN `easy_cheese`.`customers` `c` ON ((`i`.`customer_id` = `c`.`customer_id`))) \
+        JOIN `easy_cheese`.`invoice_line_items` `li` ON ((`i`.`invoice_id` = `li`.`invoice_id`))) \
+        JOIN `easy_cheese`.`products` `p` ON ((`li`.`product_id` = `p`.`product_id`))) \
+    GROUP BY `i`.`invoice_id`\
+	order by i.invoice_id desc limit 1;"
+    csvInfo = executeQueryAndReturnResult(sql)[1][0]
+    data = (csvInfo[0], csvInfo[1], csvInfo[2], csvInfo[3], csvInfo[5], csvInfo[6], csvInfo[7], csvInfo[8])
+    return data
+
