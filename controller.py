@@ -227,7 +227,8 @@ def getAllCustomers():
     sql = f"""
         SELECT c.customer_id, CONCAT(c.first_name, ' ', c.last_name) AS name, c.address, c.email_address, c.phone_number
         FROM easy_cheese.customers c
-        GROUP BY c.customer_id, c.address, c.email_address, c.phone_number;
+        GROUP BY c.customer_id, c.address, c.email_address, c.phone_number
+	ORDER BY c.customer_id;
     """
     return executeQueryAndReturnResult(sql)
 
