@@ -10,6 +10,23 @@ from controller import *
 
 
 class MainWindow(QMainWindow):
+    """
+    The main application window for the Easy Cheese Point of Sale (POS) system.
+
+    Inherits from QtWidgets.QWidget and contains methods for initializing various components of the POS system.
+
+    Attributes:
+        cashId (QLineEdit): The QLineEdit widget for entering the cash register ID.
+        cashPass (QLineEdit): The QLineEdit widget for entering the cash register password.
+        cashLoginBtn (QPushButton): The QPushButton for logging in to the cash register.
+        cashLoginFeedback (QLabel): The QLabel for displaying login feedback.
+        tab (QWidget): The main tab widget for the POS system.
+        tab_2 (QWidget): The tab widget for the inventory management.
+        tab_3 (QWidget): The tab widget for the customer management.
+        tab_4 (QWidget): The tab widget for the manager panel.
+        tab_5 (QWidget): The tab widget for the checkout panel.
+        tab_6 (QWidget): The tab widget for the login panel.
+    """
     def __init__(self):
         super().__init__()
         uic.loadUi('easy-cheese.ui', self)
@@ -19,10 +36,14 @@ class MainWindow(QMainWindow):
         self.initializeCustomers()
         self.initializeManager()
         self.intializeLogin()
-
         self.initializeInvoicesTable()
 
+
     def intializeLogin(self):
+        """
+        Initializes the login panel components and connects the login button click event to the
+        cashLoginBtnClickedHandler() method.
+        """
         self.cashId = self.findChild(QLineEdit, 'cashId')
         self.cashPass = self.findChild(QLineEdit, 'cashPass')
         self.cashLoginBtn = self.findChild(QPushButton, 'cashLoginBtn')
@@ -39,8 +60,18 @@ class MainWindow(QMainWindow):
         self.tab_3.setEnabled(False)
         self.tab_4.setEnabled(False)
         self.tab_6.setEnabled(True)
-
+        
+        
     def cashLoginBtnClickedHandler(self):
+        """
+        Event handler for the cashLoginBtn click event. Handles the logic for logging in to the cash register.
+
+        If the cashId and cashPass fields are not empty, it compares the entered ID and password with the cashier info
+        retrieved from the getCashierInfo() function. If the entered ID and password match a cashier's info, it enables
+        or disables certain tabs in the POS system based on the cashier's role (manager or regular cashier) and displays
+        appropriate feedback messages.
+
+        """
         if self.cashId.text() == '' or self.cashPass.text() == '':
             msg = QMessageBox(self)
             msg.setWindowTitle("Error")
@@ -72,7 +103,20 @@ class MainWindow(QMainWindow):
                     else:
                         self.cashLoginFeedback.setText('Incorrect username or password.')
 
+
     def initializeCheckoutWindow(self):
+        """
+        Initializes the checkout window with necessary components.
+
+        This method sets up various components of the checkout window, such as combo boxes, line edits, buttons, and table
+        widget, and connects them to their respective event handlers.
+
+        Args:
+            self: The instance of the class calling this method.
+
+        Returns:
+            None
+        """
         self.coProdNameCbo = self.findChild(QComboBox, 'coProdNameCbo')
         self.lblCoTotal = self.findChild(QLabel, 'lblCoTotal')
         self.coQtyBO = self.findChild(QSpinBox, 'coQtyBO')
@@ -114,7 +158,18 @@ class MainWindow(QMainWindow):
         self.ecCboCustomer_2.currentIndexChanged.connect(self.customerInfoCurrentIndexChangedHandler)
         self.refreshCustomerComboBox()
 
+
     def addToTableBtnClickedHandler(self):
+        """
+        Handler for 'Add to Table' button clicked event in the checkout window.
+
+        Retrieves the selected product information from the product name combo box and the quantity from the quantity spin box.
+        Checks if the product already exists in the table, and updates the quantity and total if it does.
+        If the product does not exist in the table, a new row is inserted with the product information.
+        Updates the total price of the checkout table.
+        Displays error messages if the product is out of stock or if the purchase quantity exceeds the available quantity.
+
+        """
         rowPosition = self.coTbl.rowCount()
         pID = self.coProdNameCbo.currentData()
         info = getProductNameByID(pID)
@@ -159,7 +214,12 @@ class MainWindow(QMainWindow):
 
         self.get_total()
 
+
     def get_total(self):
+        """
+        Calculates and updates the overall total price of items in the checkout table.
+
+        """ 
         rowPosition = self.coTbl.rowCount()
         overall_total = 0
         qtyPrice = []
@@ -172,7 +232,12 @@ class MainWindow(QMainWindow):
 
         self.lblCoTotal.setText(str(round(overall_total, 2)))
 
+
     def initializeInventory(self):
+        """
+        Initializes the inventory interface by connecting signals to slots and populating data.
+
+        """
         # Edit Product
         self.invPnameCbo = self.findChild(QComboBox, 'invPnameCbo')
         self.pidLineEdit = self.findChild(QLineEdit, 'pidLineEdit')
@@ -211,7 +276,12 @@ class MainWindow(QMainWindow):
         self.invPnameCbo.currentIndexChanged.connect(self.productInfoCurrentIndexChangedHandler)
         self.refreshProductComboBox()
 
+
     def refreshProductTable(self):
+        """
+        Refreshes the product table in the inventory interface based on the selected radio button.
+
+        """
         if self.rdoOutOfStock.isChecked():
             colNames, data = getAllProductsQtyZero()
             self.displayDataInTable(colNames, data, self.invTbl)
@@ -219,7 +289,13 @@ class MainWindow(QMainWindow):
             colNames, data = getAllProducts()
             self.displayDataInTable(colNames, data, self.invTbl)
 
+
     def coDeleteBtnClickHandler(self):
+        """
+        Click handler for the "Delete" button in the checkout interface.
+        Removes the selected row from the checkout table, updates the overall total, and prints a message.
+
+        """
         qtyPrice = []
         overall_total = 0
 
@@ -233,7 +309,14 @@ class MainWindow(QMainWindow):
 
         print('Item Deleted')
 
+
     def coCOnfirmClickHandler(self):
+        """
+        Click handler for the "Confirm" button in the checkout interface.
+        Creates an invoice and line items, updates product quantities, clears the checkout table,
+        refreshes the product table, invoice table, and CSV data, and creates a new invoice CSV.
+
+        """
         rowPosition = self.coTbl.rowCount()
         information = []
         cid = self.eccidLineEdit_2.text()
@@ -269,11 +352,27 @@ class MainWindow(QMainWindow):
             print(csvData)
 
             self.createNewInvoiceCSV(csvData)
-
+    
+    
     def createInvoiceAndLineItems(self, cid):
+        """
+        Creates an invoice and line items in the database.
+
+        Args:
+            cid (int): Customer ID for the invoice.
+
+        """
         createInvoice(cid)
 
+
     def peditBtnClickHandler(self):
+        """
+        Handles the click event of the 'Edit Product' button.
+
+        Validates the input fields and updates the product information in the database if valid.
+        Refreshes product table, product combo boxes, and checkout combo boxes upon successful edit.
+
+        """
         if self.pnameLineEdit.text() == '' or self.pdescLineEdit.text() == '' or self.ppriceLineEdit.text() == '' or self.pqtyLineEdit.text() == '' or self.vidLineEdit.text() == '':
             msg = QMessageBox(self)
             msg.setWindowTitle("Error")
@@ -286,18 +385,18 @@ class MainWindow(QMainWindow):
                 pid = self.pidLineEdit.text()
                 name = self.pnameLineEdit.text()
                 assert name != "", 'Product name is mandatory... Please try again.'
-                assert name != int or float, 'Product name has to be a string... Please try again.'
+                assert isinstance(name, str), 'Product name has to be a string... Please try again.'
                 desc = self.pdescLineEdit.text()
                 assert desc != "", 'Product description is mandatory... Please try again.'
-                assert desc != int or float, 'Product description has to be a string... Please try again.'
+                assert isinstance(desc, str), 'Product description has to be a string... Please try again.'
                 price = self.ppriceLineEdit.text()
-                assert price != str or int, 'Product price has to be a float... Please try again.'
+                assert isinstance(price, float) or isinstance(price, int), 'Product price has to be a float... Please try again.'
                 assert price != "", 'Product price is mandatory... Please try again.'
                 pqty = self.pqtyLineEdit.text()
-                assert pqty != str, 'Product quantity has to be an integer... Please try again.'
+                assert isinstance(pqty, int), 'Product quantity has to be an integer... Please try again.'
                 assert pqty != "", 'Product quantity is mandatory... Please try again.'
                 vid = self.vidLineEdit.text()
-                assert vid != str, 'Vendor ID has to be an integer... Please try again.'
+                assert isinstance(vid, int), 'Vendor ID has to be an integer... Please try again.'
                 assert vid != "", 'Vendor ID is mandatory... Please try again.'
 
                 result = updateProduct(pid, name, desc, vid, pqty, price)
@@ -328,7 +427,15 @@ class MainWindow(QMainWindow):
             except AssertionError as ae:
                 self.lblEditDeleteProd.setText(f"{ae}")
 
+
     def pdelBtnClickHandler(self):
+        """
+        Handles the click event of the 'Delete Product' button.
+
+        Displays a confirmation dialog to confirm the deletion of the product.
+        If confirmed, deletes the product from the database and refreshes relevant UI components.
+
+        """
         try:
             name = self.pnameLineEdit.text()
             msg = QMessageBox(self)
@@ -356,6 +463,13 @@ class MainWindow(QMainWindow):
                 self.lblEditDeleteProd.setText(e)
 
     def aaddProductBtnClickHandler(self):
+        """
+        Handles the click event of the 'Add Product' button.
+
+        Validates the input fields for product information.
+        If valid, adds the product to the database and refreshes relevant UI components.
+
+        """
         try:
             if self.apnameLineEdit.text() == '' or self.apdescLineEdit.text() == '' or self.appriceLineEdit.text() == '' or self.apqtyLineEdit.text() == '' or self.avidLineEdit.text() == '':
                 msg = QMessageBox(self)
@@ -397,7 +511,17 @@ class MainWindow(QMainWindow):
         except AssertionError as ae:
             self.lblAddProd.setText(f"{ae}")
 
+
     def displayDataInTable(self, columns, rows, table: QTableWidget):
+        """
+        Displays data in a table widget.
+
+        Args:
+        columns (list): List of column names.
+        rows (list): List of rows, where each row is a list of values.
+        table (QTableWidget): The table widget to display the data in.
+
+        """
         table.setRowCount(len(rows))
         table.setColumnCount(len(columns))
         for i in range(len(rows)):
@@ -408,7 +532,12 @@ class MainWindow(QMainWindow):
         for i in range(table.columnCount()):
             table.setHorizontalHeaderItem(i, QTableWidgetItem(f'{columns[i]}'))
 
+
     def refreshProductComboBox(self):
+        """
+        Refreshes the product combo box with the latest data from the database.
+
+        """
         try:
             pID = self.invPnameCbo.currentData()
             info = getProductNameByID(pID)
@@ -422,7 +551,12 @@ class MainWindow(QMainWindow):
         except Exception as e:
             print(e)
 
+
     def refreshCheckoutComboBox(self):
+        """
+        Refreshes the checkout combo box with the latest data from the database.
+
+        """
         try:
             pID = self.coProdNameCbo.currentData()
             info = getProductNameByID(pID)
@@ -432,16 +566,44 @@ class MainWindow(QMainWindow):
         except Exception as e:
             print(e)
 
+
     def productInfoCurrentIndexChangedHandler(self):
+        """
+        Handles the current index changed event of the product combo box.
+
+        Refreshes the product combo box.
+
+        """
         self.refreshProductComboBox()
 
+
     def checkInfoCurrentIndexChangedHandler(self):
+        """
+        Handles the current index changed event of the checkout combo box.
+
+        Refreshes the checkout combo box.
+
+        """
         self.refreshCheckoutComboBox()
 
+
     def customerInfoCurrentIndexChangedHandler(self):
+        """
+        Handles the current index changed event of the customer combo box.
+
+        Refreshes the customer combo box.
+
+        """
         self.refreshCustomerComboBox()
 
     def initializeAllProductsTable(self):
+        """
+        Initializes the "All Products" table with data from the database.
+
+        Fetches data from the database based on the selected radio button
+        (Out of Stock or All Products) and displays it in the table.
+
+        """
         if self.rdoOutOfStock.isChecked():
             self.invTbl = self.findChild(QTableWidget, 'invTbl')
             colNames, data = getAllProductsQtyZero()
@@ -452,6 +614,13 @@ class MainWindow(QMainWindow):
             self.displayDataInTable(colNames, data, self.invTbl)
 
     def initializeActiveCustomerTable(self):
+        """
+        Initializes the "Active Customers" table with data from the database.
+
+        Fetches data from the database based on the selected option in the
+        activeCustomersCbo combo box, and displays it in the table.
+
+        """
         try:
             self.activeTableWidget_2 = self.findChild(QTableWidget, 'activeTableWidget_2')
 
@@ -487,7 +656,16 @@ class MainWindow(QMainWindow):
             # I have no idea why it is spitting this error out, but it still works
             pass
 
+
     def initializeCustomers(self):
+        """
+        Initializes the customer-related UI elements.
+
+        Sets up the connections between the UI elements and their respective
+        click or index change event handlers. Also fetches customer data from
+        the database and populates the customer combo boxes.
+
+        """
         self.acfnameLineEdit = self.findChild(QLineEdit, 'acfnameLineEdit')
         self.aclnameLineEdit = self.findChild(QLineEdit, 'aclnameLineEdit')
         self.acaddressLineEdit = self.findChild(QLineEdit, 'acaddressLineEdit')
@@ -515,10 +693,26 @@ class MainWindow(QMainWindow):
         self.ecCboCustomer.currentIndexChanged.connect(self.customerInfoCurrentIndexChangedHandler)
         self.refreshCustomerComboBox()
 
+
     def initializeManager(self):
+        """
+        Initializes the Manager view.
+
+        Calls the necessary functions to initialize the Invoices table.
+
+        """
         self.initializeInvoicesTable()
 
+
     def acBtnClickHandler(self):
+        """
+        Handles the click event of the 'Add Customer' button.
+
+        Fetches the customer data from the input fields and validates them.
+        If the data is valid, adds the customer to the database and updates
+        the UI elements accordingly.
+
+        """
         try:
             fname = self.acfnameLineEdit.text()
             assert fname != "", 'First name is mandatory... Please try again.'
@@ -548,7 +742,16 @@ class MainWindow(QMainWindow):
         except AssertionError as ae:
             self.acLabel.setText(str(ae))
 
+
     def ecBtnClickHandler(self):
+        """
+        Handles the click event of the 'Edit Customer' button.
+
+        Fetches the edited customer data from the input fields and validates them.
+        If the data is valid, updates the customer in the database and updates
+        the UI elements accordingly.
+
+        """
         try:
 
             cid = self.eccidLineEdit.text()
@@ -582,14 +785,26 @@ class MainWindow(QMainWindow):
 
         self.refreshCustomersTab()
 
+
     def refreshCustomersTab(self):
+        """
+        Clears the input fields for adding a new customer.
+
+        No parameters required.
+        """
         self.acfnameLineEdit.clear()
         self.aclnameLineEdit.clear()
         self.acaddressLineEdit.clear()
         self.acemailLineEdit.clear()
         self.acphoneLineEdit.clear()
 
+
     def initializeInvoicesTable(self):
+        """
+        Initializes the invoice table widgets and connects a click event handler to the "Get Line Items" button.
+
+        No parameters required.
+        """
         self.invoicesTableWidget_2 = self.findChild(QTableWidget, 'invoicesTableWidget_2')
         self.invoicesTableWidget = self.findChild(QTableWidget, 'invoicesTableWidget')
         self.getLineItemsBtn = self.findChild(QPushButton, 'getLineItemsBtn')
@@ -598,11 +813,27 @@ class MainWindow(QMainWindow):
         colNames, data = getInvoices()
         self.displayInvoiceDataInTable(colNames, data, self.invoicesTableWidget)
 
+
     def refreshInvoiceTable(self):
+        """
+        Refreshes the invoice table with updated data.
+
+        No parameters required.
+        """
         colNames, data = getInvoices()
         self.displayInvoiceDataInTable(colNames, data, self.invoicesTableWidget)
 
+
     def invoiceLineItemsClickedHandler(self):
+        """
+        Event handler for the "Get Line Items" button click event in the invoices table.
+
+        Retrieves the currently selected row in the invoices table, checks if a row is selected,
+        and displays an error message if no row is selected. Otherwise, it retrieves the selected
+        invoice ID and displays the line items associated with that invoice in a separate table.
+
+        No parameters required.
+        """
         row = self.invoicesTableWidget.currentRow()
         if row == -1:
             msg = QMessageBox(self)
@@ -615,7 +846,18 @@ class MainWindow(QMainWindow):
             item = self.invoicesTableWidget.item(row, 0).text()
             self.displayLineItemsInTable(item)
 
+
     def displayInvoiceDataInTable(self, columns, rows, table: QTableWidget):
+        """
+        Displays the invoice data in a table widget.
+
+        Parameters:
+            - columns (list): List of column names for the table.
+            - rows (list): List of rows containing the invoice data.
+            - table (QTableWidget): The table widget to display the invoice data.
+
+        No return value.
+        """
         table.setRowCount(len(rows))
         table.setColumnCount(len(columns))
         for i in range(len(rows)):
@@ -627,7 +869,18 @@ class MainWindow(QMainWindow):
         for i in range(table.columnCount()):
             table.setHorizontalHeaderItem(i, QTableWidgetItem(f'{columns[i]}'))
 
+
     def displayActiveCustomersInTable(self, columns, rows, table: QTableWidget):
+        """
+        Displays the active customers data in a table widget.
+
+        Parameters:
+            - columns (list): List of column names for the table.
+            - rows (list): List of rows containing the active customers data.
+            - table (QTableWidget): The table widget to display the active customers data.
+
+        No return value.
+        """
         table.setRowCount(len(rows))
         table.setColumnCount(len(columns))
         for i in range(len(rows)):
@@ -638,7 +891,16 @@ class MainWindow(QMainWindow):
         for i in range(table.columnCount()):
             table.setHorizontalHeaderItem(i, QTableWidgetItem(f'{columns[i]}'))
 
+
     def displayLineItemsInTable(self, iid):
+        """
+        Displays the line items data associated with a selected invoice in a separate table widget.
+
+        Parameters:
+            - iid (int): The invoice ID for which to display the line items.
+
+        No return value.
+        """
         self.invoicesTableWidget_2.clear()
         self.invoicesTableWidget_2.setRowCount(0)
         self.invoicesTableWidget_2.setColumnCount(3)
@@ -653,7 +915,16 @@ class MainWindow(QMainWindow):
             self.invoicesTableWidget_2.setItem(rowPosition, 1, QTableWidgetItem(str(info[i][1])))
             self.invoicesTableWidget_2.setItem(rowPosition, 2, QTableWidgetItem(str(info[i][2])))
 
+
     def refreshCustomerComboBox(self):
+        """
+        Refreshes the customer combo boxes with updated customer information.
+
+        This function retrieves customer information from the corresponding combo boxes and updates the related line edit
+        fields with the retrieved information. If an exception occurs during the process, it will be printed to the console.
+
+        No parameters or return value.
+        """
         try:
             cid = self.ecCboCustomer.currentData()
             info = getCustomerNameByID(cid)
@@ -674,6 +945,7 @@ class MainWindow(QMainWindow):
             self.ecphoneLineEdit_2.setText(info1['phone_number'])
         except Exception as e:
             print(e)
+
 
     def createNewInvoiceCSV(self,data):
         """Creates a new Invoice CSV file with a header row and single data row
